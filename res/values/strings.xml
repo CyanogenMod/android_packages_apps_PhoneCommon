@@ -129,4 +129,5 @@
     <!-- In-call screen: message displayed in an error dialog -->
     <string name="incall_error_missing_voicemail_number">Voicemail number unknown.</string>
 
+    <string name="to_hint">1111:to;sip:abby@example.com:bcc;sip:bill@example.com:cc;</string>
 </resources>
