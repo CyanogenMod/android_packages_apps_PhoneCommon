@@ -126,6 +126,23 @@
             android:state_enabled="false"
             android:contentDescription="@string/description_delete_button"
             android:src="@drawable/ic_dialpad_delete" />
+
+      <EditText
+        android:id="@+id/recipients"
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginLeft="8dip"
+        android:layout_weight="1"
+        android:autoText="true"
+        android:background="@android:color/transparent"
+        android:hint="@string/to_hint"
+        android:maxLength="2000"
+        android:maxLines="3"
+        android:minHeight="48dip"
+        android:textColor="@color/dialpad_digits_text_color"
+        android:textSize="16sp"
+        android:visibility="gone"/>
     </LinearLayout>
 
     <View
