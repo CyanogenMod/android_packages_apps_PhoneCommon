@@ -26,6 +26,7 @@ import android.graphics.drawable.RippleDrawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
@@ -119,16 +120,26 @@ public class DialpadView extends LinearLayout {
                 R.string.dialpad_8_letters, R.string.dialpad_9_letters,
                 R.string.dialpad_star_letters, R.string.dialpad_pound_letters};
 
+        final int[] letter2Ids = new int[] {
+                R.string.dialpad_0_2_letters, R.string.dialpad_1_2_letters,
+                R.string.dialpad_2_2_letters, R.string.dialpad_3_2_letters,
+                R.string.dialpad_4_2_letters, R.string.dialpad_5_2_letters,
+                R.string.dialpad_6_2_letters, R.string.dialpad_7_2_letters,
+                R.string.dialpad_8_2_letters, R.string.dialpad_9_2_letters,
+                R.string.dialpad_star_2_letters, R.string.dialpad_pound_2_letters};
+
         final Resources resources = getContext().getResources();
 
         DialpadKeyButton dialpadKey;
         TextView numberView;
         TextView lettersView;
+        TextView letters2View;
 
         for (int i = 0; i < mButtonIds.length; i++) {
             dialpadKey = (DialpadKeyButton) findViewById(mButtonIds[i]);
             numberView = (TextView) dialpadKey.findViewById(R.id.dialpad_key_number);
             lettersView = (TextView) dialpadKey.findViewById(R.id.dialpad_key_letters);
+            letters2View = (TextView) dialpadKey.findViewById(R.id.dialpad_key2_letters);
             final String numberString = resources.getString(numberIds[i]);
             final RippleDrawable rippleBackground =
                     (RippleDrawable) getContext().getDrawable(R.drawable.btn_dialpad_key);
@@ -143,6 +154,25 @@ public class DialpadView extends LinearLayout {
 
             if (lettersView != null) {
                 lettersView.setText(resources.getString(letterIds[i]));
+            }
+
+            String secondaryLabel = resources.getString(letter2Ids[i]);
+            if (letters2View != null) {
+                if (!TextUtils.isEmpty(secondaryLabel)) {
+                    letters2View.setText(secondaryLabel);
+                    letters2View.setVisibility(View.VISIBLE);
+
+                    // use smaller text size when both labels are present
+                    if (lettersView != null) {
+                        float size =
+                                resources.getDimension(
+                                        R.dimen.dialpad_key_letters_small_size);
+                        letters2View.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+                        lettersView.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+                    }
+                } else {
+                    letters2View.setVisibility(View.GONE);
+                }
             }
         }
 
