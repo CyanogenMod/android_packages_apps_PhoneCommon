@@ -22,5 +22,7 @@ LOCAL_RESOURCE_FILES := $(addprefix $(LOCAL_PATH)/, res)
 
 LOCAL_PACKAGE_NAME := com.android.phone.common
 
+LOCAL_JAVA_LIBRARIES := org.cyanogenmod.platform.sdk
+
 include $(BUILD_PACKAGE)
 include $(CLEAR_VARS)
