@@ -22,5 +22,5 @@
     <string name="callFailed_dialToSs">DIAL request modified to SS request.</string>
     <!-- In-call screen: call failure reason (call modified to call with modified data) -->
     <string name="callFailed_dialToDial">DIAL request modified to DIAL with different number.</string>
-    <string name="to_hint">1111:to;sip:abby@example.com:bcc;sip:bill@example.com:cc;</string>
+    <string name="to_hint" translatable="false">1111:to;sip:abby@example.com:bcc;sip:bill@example.com:cc;</string>
 </resources>
