@@ -122,6 +122,18 @@ public class AnimUtils {
      * @param startDelayMs The delay to applying the scaling in milliseconds.
      */
     public static void scaleIn(final View view, int durationMs, int startDelayMs) {
+        scaleIn(view, durationMs, startDelayMs, null);
+    }
+
+    /**
+     * Scales in the view from scale of 0 to actual dimensions.
+     * @param view The view to scale.
+     * @param durationMs The duration of the scaling in milliseconds.
+     * @param startDelayMs The delay to applying the scaling in milliseconds.
+     * @param callback The AnimationCallback to attach to the animation
+     */
+    public static void scaleIn(final View view, int durationMs, int startDelayMs,
+            final AnimationCallback callback) {
         AnimatorListenerAdapter listener = (new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -132,6 +144,16 @@ public class AnimUtils {
             public void onAnimationCancel(Animator animation) {
                 view.setScaleX(1);
                 view.setScaleY(1);
+                if (callback != null) {
+                    callback.onAnimationCancel();
+                }
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (callback != null) {
+                    callback.onAnimationEnd();
+                }
             }
         });
         scaleInternal(view, 0 /* startScaleValue */, 1 /* endScaleValue */, durationMs,
@@ -143,12 +165,26 @@ public class AnimUtils {
      * Scales out the view from actual dimensions to 0.
      * @param view The view to scale.
      * @param durationMs The duration of the scaling in milliseconds.
+     * @param callback The AnimationCallback to attach
      */
     public static void scaleOut(final View view, int durationMs) {
+        scaleOut(view, durationMs, null);
+    }
+
+    /**
+     * Scales out the view from actual dimensions to 0.
+     * @param view The view to scale.
+     * @param durationMs The duration of the scaling in milliseconds.
+     * @param callback The AnimationCallback to attach
+     */
+    public static void scaleOut(final View view, int durationMs, final AnimationCallback callback) {
         AnimatorListenerAdapter listener = new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 view.setVisibility(View.GONE);
+                if (callback != null) {
+                    callback.onAnimationEnd();
+                }
             }
 
             @Override
@@ -156,6 +192,9 @@ public class AnimUtils {
                 view.setVisibility(View.GONE);
                 view.setScaleX(0);
                 view.setScaleY(0);
+                if (callback != null) {
+                    callback.onAnimationCancel();
+                }
             }
         };
 
