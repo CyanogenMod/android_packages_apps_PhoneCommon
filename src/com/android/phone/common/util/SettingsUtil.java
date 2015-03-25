@@ -24,7 +24,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Vibrator;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -118,11 +117,7 @@ public class SettingsUtil {
     }
 
     public static void updateRingtoneName(Context context, Handler handler,
-            int type, Preference preference, int msg, int phoneId) {
-        if (preference == null) {
-            return;
-        }
-
+            int type, String key, int msg, int phoneId) {
         final Uri ringtoneUri;
         boolean defaultRingtone = false;
         if (type == RingtoneManager.TYPE_RINGTONE) {
@@ -132,7 +127,7 @@ public class SettingsUtil {
         } else {
             final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             // For voicemail notifications, we use the value saved in Phone's shared preferences.
-            String uriString = prefs.getString(preference.getKey(), null);
+            String uriString = prefs.getString(key, null);
             if (TextUtils.isEmpty(uriString)) {
                 // silent ringtone
                 ringtoneUri = null;
