@@ -48,18 +48,12 @@
   <string name="callFailed_server_unreachable">سێرڤه‌ر نه‌گه‌یه‌نه‌ره‌</string>
   <string name="callFailed_number_unreachable">ژماره‌ نه‌گه‌یه‌نه‌ره‌</string>
   <string name="callFailed_invalid_credentials">ناو و وشه‌ی نهێنی به‌کارهێنه‌ر هه‌ڵه‌یه‌</string>
-  <string name="callFailed_out_of_network">په‌یوه‌ندی کرا له‌ ده‌ره‌وه‌ی هێڵ</string>
   <string name="callFailed_server_error">هه‌ڵه‌ی سێرڤه‌ر.جارێکی تر هه‌وڵ بده‌ره‌وه‌.</string>
   <string name="callFailed_noSignal">نیشانە نیە</string>
   <string name="callFailed_limitExceeded">سنوری ACM تێپه‌ڕیوه‌</string>
   <string name="callFailed_powerOff">کوژانەوەی ڕادیۆ</string>
   <string name="callFailed_simError">سیمکاردی تێدا نییه‌ یان هه‌ڵه‌ی هه‌یه‌</string>
-  <string name="callFailed_outOfService">تۆڕی مۆبایل ئاماده‌نییه‌</string>
   <string name="callFailed_fdn_only">په‌یوه‌ندی ڕۆشتن به‌ستراوه‌ته‌وه‌ به‌ FDN.</string>
-  <string name="callFailed_cb_enabled">ناتوانی په‌یوه‌ندی بکه‌یت کاتێک کاڵ بارینگ کارده‌کات.</string>
-  <string name="callFailed_dsac_restricted">هه‌موو په‌یوه‌ندیه‌کان به‌ستراونه‌ته‌وه‌ له‌لایه‌ن ده‌سه‌لاتی سه‌رپه‌رشتکار.</string>
-  <string name="callFailed_dsac_restricted_emergency">په‌یوه‌ندی له‌ناکاوه‌کان به‌ستراونه‌ته‌وه‌ له‌لایه‌ن سه‌رپه‌رشتکاری ده‌سه‌لاته‌کان.</string>
-  <string name="callFailed_dsac_restricted_normal">په‌یوه‌ندییه‌ ئاساییه‌کان به‌ستراونه‌ته‌وه‌ له‌لایه‌ن سه‌رپه‌رشتی ده‌سته‌ڵاته‌کان.</string>
   <string name="callFailed_unobtainable_number">ژمارەکە لەکارە نیە</string>
   <string name="incall_error_missing_voicemail_number">ژماره‌ی ده‌نگه‌نامه‌ نه‌زانراوه‌.</string>
 </resources>
