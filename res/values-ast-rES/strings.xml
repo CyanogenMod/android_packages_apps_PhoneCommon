@@ -16,7 +16,6 @@
   ~ limitations under the License
   -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="dialpad_0_number">0</string>
   <string name="dialpad_1_number">1</string>
   <string name="dialpad_2_number">2</string>
   <string name="dialpad_3_number">3</string>
@@ -48,18 +47,12 @@
   <string name="callFailed_server_unreachable">Nun pue afitase conexón col sirvidor</string>
   <string name="callFailed_number_unreachable">Nun pue afitase la llamada</string>
   <string name="callFailed_invalid_credentials">Contraseña o nome d\'usuariu incorreutos</string>
-  <string name="callFailed_out_of_network">Llamada dende fuera de la rede</string>
   <string name="callFailed_server_error">Fallu del sirvidor, inténtalo dempués.</string>
   <string name="callFailed_noSignal">Nun hai señal</string>
   <string name="callFailed_limitExceeded">Perpasóse la llende de ACM</string>
   <string name="callFailed_powerOff">Señal móvil desactivada</string>
   <string name="callFailed_simError">Nun hai tarxeta SIM o hebo un fallu rellacionáu cola mesma</string>
-  <string name="callFailed_outOfService">La rede móvil nun ta disponible</string>
   <string name="callFailed_fdn_only">Les llamaes salientes tán restrinxíes por FDN.</string>
-  <string name="callFailed_cb_enabled">Nun puen facese llamaes mentanto tea activada la restricción de llamaes.</string>
-  <string name="callFailed_dsac_restricted">Toles llamaes tán llendaes pol control d\'accesu.</string>
-  <string name="callFailed_dsac_restricted_emergency">Les llamaes d\'emerxencia tán llendaes pol control d\'accesu.</string>
-  <string name="callFailed_dsac_restricted_normal">Les llamaes normales tán llendaes pol control d\'accesu.</string>
   <string name="callFailed_unobtainable_number">Númberu inválidu</string>
   <string name="incall_error_missing_voicemail_number">Númberu del buzón de voz desconocíu.</string>
 </resources>

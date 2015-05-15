@@ -16,7 +16,6 @@
   ~ limitations under the License
   -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="dialpad_0_number">0</string>
   <string name="dialpad_1_number">1</string>
   <string name="dialpad_2_number">2</string>
   <string name="dialpad_3_number">3</string>
@@ -48,18 +47,12 @@
   <string name="callFailed_server_unreachable">Server net erreechbar</string>
   <string name="callFailed_number_unreachable">Nummer net erreechbar</string>
   <string name="callFailed_invalid_credentials">Ongëltege Benotzernumm oder Passwuert</string>
-  <string name="callFailed_out_of_network">Uruff baussent vum Netzwierk</string>
   <string name="callFailed_server_error">Serverfeeler. Probéier méi spéit nees.</string>
   <string name="callFailed_noSignal">Kee Signal</string>
   <string name="callFailed_limitExceeded">ACM-Grenzwäert iwwerschratt</string>
   <string name="callFailed_powerOff">Radio aus</string>
   <string name="callFailed_simError">Keng SIM-Kaart oder SIM-Feeler</string>
-  <string name="callFailed_outOfService">Mobilt Netzwierk net disponibel</string>
   <string name="callFailed_fdn_only">Erausgoend Uriff ginn duerch eng Uruffaschränkung limitéiert.</string>
-  <string name="callFailed_cb_enabled">Du kanns keng Uriff maachen, wann d\'Uruffspär aktivéiert ass.</string>
-  <string name="callFailed_dsac_restricted">All Uriff ginn duerch d\'Zougrëffssteierung begrenzt.</string>
-  <string name="callFailed_dsac_restricted_emergency">Noutriff ginn duerch d\'Zougrëffssteierung begrenzt.</string>
-  <string name="callFailed_dsac_restricted_normal">Normal Uriff ginn duerch d\'Zougrëffssteierung begrenzt.</string>
   <string name="callFailed_unobtainable_number">Ongëlteg Nummer</string>
   <string name="incall_error_missing_voicemail_number">Mailbox-Nummer onbekannt.</string>
 </resources>
