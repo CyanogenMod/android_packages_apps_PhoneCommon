@@ -32,7 +32,15 @@
         <item name="android:layout_gravity">center_vertical</item>
     </style>
 
+    <style name="DialpadKeyNumberStyle_land_hdpi" parent="DialpadKeyNumberStyle">
+        <item name="android:textSize">@dimen/dialpad_key_numbers_size_land_hdpi</item>
+    </style>
+
     <style name="DialpadBottomKeyNumberStyle" parent="DialpadKeyNumberStyle"/>
+
+    <style name="DialpadBottomKeyNumberStyle_land_hdpi" parent="DialpadKeyNumberStyle">
+        <item name="android:textSize">@dimen/dialpad_key_numbers_size_land_hdpi</item>
+    </style>
 
     <style name="DialpadKeySpecialCharStyle">
         <item name="android:textColor">@color/dialpad_secondary_text_color</item>
@@ -47,8 +55,16 @@
         <item name="android:textSize">@dimen/dialpad_key_pound_size</item>
     </style>
 
+    <style name="DialpadKeyPoundStyle_land_hdpi" parent="DialpadKeySpecialCharStyle">
+        <item name="android:textSize">@dimen/dialpad_key_pound_size_land_hdpi</item>
+    </style>
+
     <style name="DialpadKeyStarStyle" parent="DialpadKeySpecialCharStyle">
         <item name="android:textSize">@dimen/dialpad_key_star_size</item>
+    </style>
+
+    <style name="DialpadKeyStarStyle_land_hdpi" parent="DialpadKeySpecialCharStyle">
+        <item name="android:textSize">@dimen/dialpad_key_star_size_land_hdpi</item>
     </style>
 
     <style name="DialpadKeyLettersStyle">
