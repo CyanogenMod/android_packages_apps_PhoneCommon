@@ -16,11 +16,14 @@
 
 <resources>
     <!-- Text dimensions for dialpad keys -->
-    <dimen name="dialpad_key_numbers_size">@dimen/dialpad_key_numbers_default_size</dimen>
+    <dimen name="dialpad_key_numbers_size">@dimen/dialpad_key_numbers_default_size</dimen>    
     <dimen name="dialpad_key_numbers_default_size">36sp</dimen>
+    <dimen name="dialpad_key_numbers_size_land_hdpi">20sp</dimen>
     <dimen name="dialpad_key_letters_size">12sp</dimen>
     <dimen name="dialpad_key_pound_size">23sp</dimen>
+    <dimen name="dialpad_key_pound_size_land_hdpi">20sp</dimen>
     <dimen name="dialpad_key_star_size">36sp</dimen>
+    <dimen name="dialpad_key_star_size_land_hdpi">20sp</dimen>
     <dimen name="dialpad_key_height">64dp</dimen>
     <dimen name="dialpad_key_number_margin_bottom">@dimen/dialpad_key_number_default_margin_bottom</dimen>
     <dimen name="dialpad_key_number_default_margin_bottom">3dp</dimen>
