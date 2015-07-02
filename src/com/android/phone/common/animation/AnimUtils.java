@@ -60,6 +60,7 @@ public class AnimUtils {
                 if (callback != null) {
                     callback.onAnimationEnd();
                 }
+                fadeOut.animate().setListener(null);
             }
 
             @Override
@@ -69,6 +70,7 @@ public class AnimUtils {
                 if (callback != null) {
                     callback.onAnimationCancel();
                 }
+                fadeOut.animate().setListener(null);
             }
         });
         if (durationMs != DEFAULT_DURATION) {
@@ -100,6 +102,7 @@ public class AnimUtils {
                 if (callback != null) {
                     callback.onAnimationCancel();
                 }
+                fadeIn.animate().setListener(null);
             }
 
             @Override
@@ -107,6 +110,7 @@ public class AnimUtils {
                 if (callback != null) {
                     callback.onAnimationEnd();
                 }
+                fadeIn.animate().setListener(null);
             }
         });
         if (durationMs != DEFAULT_DURATION) {
@@ -147,6 +151,7 @@ public class AnimUtils {
                 if (callback != null) {
                     callback.onAnimationCancel();
                 }
+                view.animate().setListener(null);
             }
 
             @Override
@@ -154,6 +159,7 @@ public class AnimUtils {
                 if (callback != null) {
                     callback.onAnimationEnd();
                 }
+                view.animate().setListener(null);
             }
         });
         scaleInternal(view, 0 /* startScaleValue */, 1 /* endScaleValue */, durationMs,
@@ -185,6 +191,7 @@ public class AnimUtils {
                 if (callback != null) {
                     callback.onAnimationEnd();
                 }
+                view.animate().setListener(null);
             }
 
             @Override
@@ -195,6 +202,7 @@ public class AnimUtils {
                 if (callback != null) {
                     callback.onAnimationCancel();
                 }
+                view.animate().setListener(null);
             }
         };
 
