@@ -16,6 +16,7 @@
   ~ limitations under the License
   -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="dialpad_0_number">0</string>
   <string name="dialpad_1_number">1</string>
   <string name="dialpad_2_number">2</string>
   <string name="dialpad_3_number">3</string>
