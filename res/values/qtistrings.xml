@@ -55,4 +55,6 @@
     <string name="dialpad_star_labels"></string>
     <!--  Do not translate. -->
     <string name="dialpad_pound_labels"></string>
+    <!-- Text for CallFailCause.NON_SELECTED_USER_CLEARING = 26 -->
+    <string name="callFailed_non_selected_user_clearing"></string>
 </resources>
