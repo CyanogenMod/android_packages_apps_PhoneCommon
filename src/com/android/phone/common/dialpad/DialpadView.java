@@ -297,6 +297,15 @@ public class DialpadView extends LinearLayout {
         return mDelete;
     }
 
+    /**
+     * Return the container view for the sim selector and VoLTE annunciator.
+     */
+    public View getCallMethodVolte() {
+        // Programming note: no point in caching this locally;
+        // caller will be caching it upstairs.
+        return findViewById(R.id.call_method_volte);
+    }
+
     public View getOverflowMenuButton() {
         return mOverflowMenuButton;
     }
