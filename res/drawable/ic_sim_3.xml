@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2015 The CyanogenMod Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+ -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="68dp"
+    android:height="54dp"
+    android:viewportWidth="68"
+    android:viewportHeight="54">
+
+    <path
+        android:fillColor="#000000"
+        android:pathData="M61.2,53.966c3.74,0,6.8-3.004,6.8-6.716v-27L47.6,0H6.8
+C3.06,0,0,3.037,0,6.75v40.534C0,50.996,3.06,54,6.8,54L61.2,53.966z
+M27.142,24.179h3.363c1.285,0,2.235-0.338,2.851-1.015
+s0.923-1.603,0.923-2.779c0-0.451-0.072-0.878-0.215-1.282s-0.359-0.759-0.646-1.066s-0.653-0.55-1.097-0.728
+c-0.444-0.178-0.967-0.267-1.569-0.267c-0.424,0-0.837,0.065-1.241,0.195s-0.766,0.314-1.087,0.554s-0.581,0.53-0.779,0.872
+c-0.198,0.342-0.297,0.731-0.297,1.169h-6.911c0-1.271,0.273-2.41,0.82-3.415s1.285-1.856,2.215-2.553s2-1.23,3.209-1.6
+s2.485-0.554,3.825-0.554c1.586,0,3.035,0.185,4.348,0.554s2.437,0.913,3.374,1.63s1.665,1.606,2.184,2.666
+s0.779,2.287,0.779,3.681c0,0.684-0.109,1.34-0.328,1.969s-0.526,1.22-0.923,1.774s-0.882,1.056-1.456,1.507
+s-1.21,0.841-1.907,1.169c1.586,0.574,2.83,1.446,3.732,2.615s1.354,2.615,1.354,4.337c0,1.395-0.284,2.639-0.851,3.732
+s-1.35,2.017-2.348,2.769s-2.177,1.323-3.538,1.712s-2.833,0.584-4.419,0.584c-0.834,0-1.671-0.075-2.512-0.226
+s-1.651-0.376-2.43-0.677s-1.511-0.687-2.194-1.159s-1.275-1.032-1.774-1.682s-0.896-1.384-1.189-2.205s-0.441-1.743-0.441-2.769
+h6.952c0,0.479,0.103,0.923,0.308,1.333s0.482,0.769,0.831,1.077s0.755,0.547,1.22,0.718s0.957,0.256,1.477,0.256
+c0.629,0,1.193-0.092,1.692-0.277c0.499-0.185,0.919-0.441,1.261-0.769s0.602-0.711,0.779-1.148s0.267-0.909,0.267-1.415
+c0-1.504-0.376-2.57-1.128-3.199s-1.791-0.943-3.117-0.943h-3.363V24.179z" />
+</vector>

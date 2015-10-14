@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
-     Copyright (C) 2014-2015 The CyanogenMod Project
+     Copyright (C) 2015 The CyanogenMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,11 +14,14 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
-    <!-- In-call screen: call failure reason (call ended due to low battery) -->
-    <string name="callFailed_low_battery">Low battery</string>
 
-    <string name="to_hint" translatable="false">1111:to;sip:abby@example.com:bcc;sip:bill@example.com:cc;</string>
-    <!-- String describing the sim button in the dialpad. -->
-    <string name="description_sim_button">Select sim</string>
+<resources>
+    <!-- Color of call method spinner drop down arrow -->
+    <color name="call_method_spinner_drop_down_arrow">#000000</color>
+
+    <!-- Color of call method spinner item text -->
+    <color name="call_method_spinner_item_text_color">#de000000</color>
+
+    <!-- Color of sim icons -->
+    <color name="sim_icon_color">#f5a623</color>
 </resources>

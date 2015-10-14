@@ -18,4 +18,18 @@
     <dimen name="dialpad_key_letters_small_size">10sp</dimen>
     <dimen name="dialpad_key_margin_right">9dp</dimen>
     <dimen name="dialpad_key_number_left_margin">26dp</dimen>
+
+    <!-- Dimensions for call method spinner and items -->
+    <dimen name="call_method_spinner_padding_start">2dp</dimen>
+    <dimen name="call_method_spinner_item_default_padding">12dp</dimen>
+    <dimen name="call_method_spinner_item_secondary_padding">7dp</dimen>
+    <dimen name="call_method_spinner_item_text_left_margin">16dp</dimen>
+    <dimen name="call_method_spinner_dropdown_item_width">134dp</dimen>
+    <dimen name="call_method_spinner_icon_size">24dp</dimen>
+    <dimen name="call_method_spinner_arrow_width">24dp</dimen>
+
+    <!-- Dimensions for VoLTE annunciator -->
+    <dimen name="volte_padding_start">11dp</dimen>
+    <dimen name="volte_text_size">11dp</dimen>
+
 </resources>

@@ -68,6 +68,10 @@
         android:layout_height="@dimen/dialpad_digits_adjustable_height"
         android:orientation="horizontal">
 
+        <!-- Sim card selection and VoLTE annunciator. -->
+        <include layout="@layout/call_method_volte_single_provider" />
+        <include layout="@layout/call_method_multiple_providers" />
+
         <ImageButton android:id="@+id/dialpad_overflow"
             android:background="@drawable/btn_dialpad_key"
             android:src="@drawable/ic_overflow_menu"
