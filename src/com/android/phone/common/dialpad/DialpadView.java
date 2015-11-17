@@ -174,6 +174,7 @@ public class DialpadView extends LinearLayout {
             dialpadKey = (DialpadKeyButton) findViewById(mButtonIds[i]);
             numberView = (TextView) dialpadKey.findViewById(R.id.dialpad_key_number);
             lettersView = (TextView) dialpadKey.findViewById(R.id.dialpad_key_letters);
+            letters2View = (TextView) dialpadKey.findViewById(R.id.dialpad_key2_letters);
             labelsView = (TextView) dialpadKey.findViewById(R.id.dialpad_key_labels);
 
             final String numberString;
