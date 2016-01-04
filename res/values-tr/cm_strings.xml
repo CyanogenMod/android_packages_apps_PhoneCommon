@@ -19,5 +19,5 @@
 <resources>
   <string name="callFailed_dialToUssd">ARAMA isteği USSD isteğine dönüştürüldü.</string>
   <string name="callFailed_dialToSs">ARAMA isteği SS isteğine dönüştürüldü.</string>
-  <string name="callFailed_dialToDial">ARAMA isteği başka bir numarayla ARAMA isteğine dönüştürüldü.</string>
+  <string name="callFailed_dialToDial">ARAMA isteği başka bir numarayla ARAMAYA dönüştürüldü.</string>
 </resources>

@@ -17,7 +17,7 @@
      limitations under the License.
 -->
 <resources>
-  <string name="callFailed_dialToUssd">คำขอ DIAL ถูกแก้ไขเป็น คำขอ USSD</string>
-  <string name="callFailed_dialToSs">คำขอ DIAL ถูกแก้ไขเป็น คำขอ SS</string>
-  <string name="callFailed_dialToDial">คำขอ DIAL ถูกเปลี่ยนเป็นคำขอ DIAL ด้วยหมายเลขอื่น</string>
+  <string name="callFailed_dialToUssd">Yêu cầu QUAY SỐ đã sửa đổi theo yêu cầu USSD.</string>
+  <string name="callFailed_dialToSs">Yêu cầu QUAY SỐ đã sửa đổi theo yêu cầu SS.</string>
+  <string name="callFailed_dialToDial">Yêu cầu QUAY SỐ đã sửa đổi theo QUAY SỐ với số khác.</string>
 </resources>
