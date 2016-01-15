@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Color of call method spinner item text -->
+    <color name="call_method_spinner_item_text_color">#de000000</color>
+
+    <!-- Color of call method spinner drop down arrow -->
+    <color name="call_method_spinner_drop_down_arrow">#000000</color>
+
+    <!-- Color of sim icons -->
+    <color name="sim_icon_color">#f5a623</color>
+
+</resources>

@@ -81,6 +81,16 @@
             android:gravity="center"
             android:visibility="invisible" />
 
+        <Spinner
+            android:id="@+id/call_method_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:dropDownWidth="@dimen/call_method_spinner_dropdown_item_width"
+            android:background="@drawable/btn_dialpad_key"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/call_method_spinner_padding_start"
+            android:paddingEnd="@dimen/dialpad_digits_padding"  />
+
         <view class="com.android.phone.common.dialpad.DigitsEditText"
             xmlns:ex="http://schemas.android.com/apk/res-auto"
             android:id="@+id/digits"

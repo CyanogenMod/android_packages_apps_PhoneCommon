@@ -35,6 +35,7 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.android.phone.common.R;
@@ -68,6 +69,7 @@ public class DialpadView extends LinearLayout {
     private ImageButton mDelete;
     private View mOverflowMenuButton;
     private ColorStateList mRippleColor;
+    private Spinner mCallMethodSpinner;
 
     private ViewGroup mRateContainer;
     private TextView mIldCountry;
@@ -117,6 +119,7 @@ public class DialpadView extends LinearLayout {
         mRateContainer = (ViewGroup) findViewById(R.id.rate_container);
         mIldCountry = (TextView) mRateContainer.findViewById(R.id.ild_country);
         mIldRate = (TextView) mRateContainer.findViewById(R.id.ild_rate);
+        mCallMethodSpinner = (Spinner) findViewById(R.id.call_method_spinner);
 
         AccessibilityManager accessibilityManager = (AccessibilityManager)
                 getContext().getSystemService(Context.ACCESSIBILITY_SERVICE);
@@ -337,6 +340,8 @@ public class DialpadView extends LinearLayout {
     public ImageButton getDeleteButton() {
         return mDelete;
     }
+
+    public Spinner getCallMethodSpinner() { return mCallMethodSpinner; }
 
     public View getOverflowMenuButton() {
         return mOverflowMenuButton;
