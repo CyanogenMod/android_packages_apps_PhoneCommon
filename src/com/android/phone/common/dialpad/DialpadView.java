@@ -17,6 +17,7 @@
 package com.android.phone.common.dialpad;
 
 import android.animation.AnimatorListenerAdapter;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -280,14 +281,26 @@ public class DialpadView extends LinearLayout {
         mCanDigitsBeEdited = canBeEdited;
     }
 
-    public void setCallRateInformation(String countryName, String displayRate) {
-        if (TextUtils.isEmpty(countryName) && TextUtils.isEmpty(displayRate)) {
+    public void setCallRateInformation(String countryName, String displayRate,
+                                       final PendingIntent p) {
+        if (TextUtils.isEmpty(countryName) && TextUtils.isEmpty(displayRate) &&
+                p == null) {
             mRateContainer.setVisibility(View.GONE);
             return;
         }
         mRateContainer.setVisibility(View.VISIBLE);
         mIldCountry.setText(countryName);
         mIldRate.setText(displayRate);
+        mIldRate.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    p.send();
+                } catch (PendingIntent.CanceledException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public boolean canDigitsBeEdited() {
