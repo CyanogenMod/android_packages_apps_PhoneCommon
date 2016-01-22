@@ -28,7 +28,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-import com.android.dialer.incall.CallMethodInfo;
 
 import com.android.phone.common.R;
 

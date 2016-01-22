@@ -18,6 +18,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
+LOCAL_SRC_FILES += $(call all-java-files-under, src-ambient)
 LOCAL_RESOURCE_FILES := $(addprefix $(LOCAL_PATH)/, res)
 
 LOCAL_PACKAGE_NAME := com.android.phone.common
