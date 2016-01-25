@@ -38,7 +38,6 @@ import com.cyanogen.ambient.discovery.NudgeServices;
 import com.cyanogen.ambient.discovery.results.BundleResult;
 import com.cyanogen.ambient.discovery.util.NudgeKey;
 import com.cyanogen.ambient.incall.InCallApi;
-import com.cyanogen.ambient.incall.InCallPluginStatus;
 import com.cyanogen.ambient.incall.InCallServices;
 import com.cyanogen.ambient.incall.extension.CreditBalance;
 import com.cyanogen.ambient.incall.extension.CreditInfo;
@@ -53,6 +52,7 @@ import com.cyanogen.ambient.incall.results.MimeTypeResult;
 import com.cyanogen.ambient.incall.results.PendingIntentResult;
 import com.cyanogen.ambient.incall.results.PluginStatusResult;
 import com.cyanogen.ambient.incall.util.InCallProviderInfo;
+import com.cyanogen.ambient.plugin.PluginStatus;
 import com.google.common.base.Joiner;
 
 import java.util.ArrayList;
@@ -136,7 +136,7 @@ public class CallMethodHelper {
             ComponentName key = entry.getKey();
             CallMethodInfo value = entry.getValue();
 
-            if (value.mStatus == InCallPluginStatus.ENABLED) {
+            if (value.mStatus == PluginStatus.ENABLED) {
                 output.put(key, value);
             }
         }
@@ -328,7 +328,7 @@ public class CallMethodHelper {
         List<String> enabledMimeTypes = new ArrayList<>();
 
         for (CallMethodInfo cmi : mCallMethodInfos.values()) {
-            if (cmi.mStatus == InCallPluginStatus.ENABLED) {
+            if (cmi.mStatus == PluginStatus.ENABLED) {
                 enabledMimeTypes.add(cmi.mMimeType);
             }
         }
