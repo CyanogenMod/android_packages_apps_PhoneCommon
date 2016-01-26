@@ -86,7 +86,7 @@ public class CallMethodHelper {
 
     // To prevent multiple broadcasts and force us to wait for all items to be complete
     // this is the count of callbacks we should get for each item. Increase this if we add more.
-    private static int EXPECTED_RESULT_CALLBACKS = 8;
+    private static int EXPECTED_RESULT_CALLBACKS = 9;
 
     // To prevent multiple broadcasts and force us to wait for all items to be complete
     // this is the count of callbacks we should get for each item. Increase this if we add more.
@@ -339,6 +339,30 @@ public class CallMethodHelper {
         return mimeTypes;
     }
 
+    /**
+     * A few items need a list of video callable mime types in a comma delimited list.
+     * Since we are already querying all the plugins. We can easily build this list ahead of time.
+     *
+     * Items that require this should subscribe and grab this updated list when needed.
+     * @return string of enabled video callable mime types
+     */
+    public static String getAllEnabledVideoCallableMimeTypes() {
+        String mimeTypes = "";
+
+        List<String> enabledMimeTypes = new ArrayList<>();
+
+        for (CallMethodInfo cmi : mCallMethodInfos.values()) {
+            if (cmi.mStatus == PluginStatus.ENABLED) {
+                enabledMimeTypes.add(cmi.mVideoCallableMimeType);
+            }
+        }
+
+        if (!enabledMimeTypes.isEmpty()) {
+            mimeTypes = Joiner.on(",").skipNulls().join(enabledMimeTypes);
+        }
+        return mimeTypes;
+    }
+
     public static void updateCreditInfo(ComponentName name, GetCreditInfoResult gcir) {
         CallMethodInfo cmi = getCallMethodIfExists(name);
         if (cmi != null) {
@@ -419,6 +443,7 @@ public class CallMethodHelper {
                     getCallMethodInfo(cn);
                     getCallMethodStatus(cn);
                     getCallMethodMimeType(cn);
+                    getCallMethodVideoCallableMimeType(cn);
                     getCallMethodAuthenticated(cn, false);
                     getSettingsIntent(cn);
                     getCreditInfo(cn, false);
@@ -469,10 +494,14 @@ public class CallMethodHelper {
 
                     try {
                         cmi.mBrandIcon = pluginResources.getDrawable(icpi.getBrandIcon(), null);
+                        cmi.mSingleColorBrandIcon =
+                                pluginResources.getDrawable(icpi.getSingleColorBrandIcon(), null);
                         cmi.mBadgeIcon = pluginResources.getDrawable(icpi.getBadgeIcon(), null);
                         cmi.mLoginIcon = pluginResources.getDrawable(icpi.getLoginIcon(), null);
-                        cmi.mActionOneIcon = pluginResources.getDrawable(icpi.getActionOneIcon(), null);
-                        cmi.mActionTwoIcon = pluginResources.getDrawable(icpi.getActionTwoIcon(), null);
+                        cmi.mActionOneIcon =
+                                pluginResources.getDrawable(icpi.getActionOneIcon(), null);
+                        cmi.mActionTwoIcon =
+                                pluginResources.getDrawable(icpi.getActionTwoIcon(), null);
                     } catch (Resources.NotFoundException e) {
                         Log.e(TAG, "Resource Not found: " + cn);
                         mCallMethodInfos.remove(cn);
@@ -563,6 +592,27 @@ public class CallMethodHelper {
                 }
             }
         });
+    }
+
+    /**
+     * Get the call method mime type
+     * @param cn
+     */
+    private static void getCallMethodVideoCallableMimeType(final ComponentName cn) {
+        getInstance().mInCallApi.getVideoCallableMimeType(getInstance().mClient, cn)
+                .setResultCallback(new ResultCallback<MimeTypeResult>() {
+                    @Override
+                    public void onResult(MimeTypeResult mimeTypeResult) {
+                        synchronized (mCallMethodInfos) {
+                            CallMethodInfo cmi = getCallMethodIfExists(cn);
+                            if (cmi != null) {
+                                cmi.mVideoCallableMimeType = mimeTypeResult.mimeType;
+                                mCallMethodInfos.put(cn, cmi);
+                                maybeBroadcastToSubscribers();
+                            }
+                        }
+                    }
+                });
     }
 
     /**

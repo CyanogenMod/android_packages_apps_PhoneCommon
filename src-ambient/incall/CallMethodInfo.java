@@ -50,11 +50,13 @@ public class CallMethodInfo {
     public int mStatus;
     public boolean mIsAuthenticated;
     public String mMimeType;
+    public String mVideoCallableMimeType;
     public String mSubscriptionButtonText;
     public String mCreditButtonText;
     public String mT9HintDescription;
     public PendingIntent mSettingsIntent;
     public Drawable mBrandIcon;
+    public Drawable mSingleColorBrandIcon;
     public Drawable mBadgeIcon;
     public Drawable mLoginIcon;
     public Drawable mActionOneIcon;
@@ -70,10 +72,10 @@ public class CallMethodInfo {
     @Override
     public int hashCode() {
         return Objects.hashCode(mId, mUserHandle, mComponent, mName, mSummary, mSlotId, mSubId,
-                mColor, mStatus, mIsAuthenticated, mMimeType, mSubscriptionButtonText,
-                mCreditButtonText, mT9HintDescription, mSettingsIntent, mBrandIcon, mBadgeIcon,
-                mLoginIcon, mActionOneIcon, mActionTwoIcon, pluginResources, mActionOneText,
-                mActionTwoText, mIsInCallProvider);
+                mColor, mStatus, mIsAuthenticated, mMimeType, mVideoCallableMimeType,
+                mSubscriptionButtonText, mCreditButtonText, mT9HintDescription, mSettingsIntent,
+                mBrandIcon, mSingleColorBrandIcon, mBadgeIcon, mLoginIcon, mActionOneIcon,
+                mActionTwoIcon, pluginResources, mActionOneText, mActionTwoText, mIsInCallProvider);
     }
 
     public static final String TAG = "CallMethodInfo";
@@ -96,11 +98,13 @@ public class CallMethodInfo {
                     && Objects.equal(this.mStatus, info.mStatus)
                     && Objects.equal(this.mIsAuthenticated, info.mIsAuthenticated)
                     && Objects.equal(this.mMimeType, info.mMimeType)
+                    && Objects.equal(this.mVideoCallableMimeType, info.mVideoCallableMimeType)
                     && Objects.equal(this.mSubscriptionButtonText, info.mSubscriptionButtonText)
                     && Objects.equal(this.mCreditButtonText, info.mCreditButtonText)
                     && Objects.equal(this.mT9HintDescription, info.mT9HintDescription)
                     && Objects.equal(this.mSettingsIntent, info.mSettingsIntent)
                     && Objects.equal(this.mBrandIcon, info.mBrandIcon)
+                    && Objects.equal(this.mSingleColorBrandIcon, info.mSingleColorBrandIcon)
                     && Objects.equal(this.mBadgeIcon, info.mBadgeIcon)
                     && Objects.equal(this.mLoginIcon, info.mLoginIcon)
                     && Objects.equal(this.mActionOneIcon, info.mActionOneIcon)
