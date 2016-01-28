@@ -23,8 +23,10 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.UserHandle;
 import android.telephony.PhoneNumberUtils;
+import android.telephony.SubscriptionManager;
 import android.util.Log;
 import com.android.phone.common.ambient.AmbientConnection;
+import com.android.phone.common.R;
 import com.android.phone.common.util.StartInCallCallReceiver;
 import com.cyanogen.ambient.incall.InCallServices;
 import com.cyanogen.ambient.incall.extension.CreditBalance;
@@ -68,6 +70,8 @@ public class CallMethodInfo {
     public PendingIntent mManageCreditIntent;
     public CreditInfo mProviderCreditInfo;
     public float mCreditWarn = 0.0f;
+
+    private static CallMethodInfo sEmergencyCallMethod;
 
     @Override
     public int hashCode() {
@@ -115,6 +119,25 @@ public class CallMethodInfo {
                     && Objects.equal(this.mIsInCallProvider, info.mIsInCallProvider);
         }
         return false;
+    }
+
+    /**
+     * return empty mock call method that represents emergency call only mode
+     */
+    public static CallMethodInfo getEmergencyCallMethod(Context context) {
+        Context ctx = context.getApplicationContext();
+        if (sEmergencyCallMethod == null) {
+            sEmergencyCallMethod = new CallMethodInfo();
+            sEmergencyCallMethod.mName =
+                    ctx.getString(R.string.call_method_spinner_item_emergency_call);
+            sEmergencyCallMethod.mColor =
+                    ctx.getResources().getColor(R.color.emergency_call_icon_color);
+            sEmergencyCallMethod.mSubId = SubscriptionManager.INVALID_SUBSCRIPTION_ID;
+            sEmergencyCallMethod.mSlotId = SubscriptionManager.INVALID_SIM_SLOT_INDEX;
+            sEmergencyCallMethod.mIsInCallProvider = false;
+        }
+
+        return sEmergencyCallMethod;
     }
 
     public void placeCall(String origin, String number, Context c) {

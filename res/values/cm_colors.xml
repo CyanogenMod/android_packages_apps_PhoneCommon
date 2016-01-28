@@ -8,5 +8,6 @@
 
     <!-- Color of sim icons -->
     <color name="sim_icon_color">#f5a623</color>
+    <color name="emergency_call_icon_color">#42000000</color>
 
 </resources>

@@ -24,6 +24,7 @@
     <!-- Call method spinner - Default No SIM -->
     <string name="call_method_spinner_item_no_sim">No SIM card</string>
     <string name="call_method_spinner_item_unknown_sim">SIM <xliff:g id="slot_number">%d</xliff:g></string>
+    <string name="call_method_spinner_item_emergency_call">Emergency calls only</string>
 
     <string name="invalid_number_text">"%1$s could not make this call. Is the number correct?"</string>
 

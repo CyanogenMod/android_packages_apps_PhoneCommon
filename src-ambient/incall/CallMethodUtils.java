@@ -24,14 +24,15 @@ public class CallMethodUtils {
     public final static String PREF_LAST_ENABLED_PROVIDER = "pref_last_enabled_provider";
     public final static String PREF_INTERNATIONAL_CALLS = "pref_international_calls";
 
-    /**
-     * Return whether the card in the given slot is activated
-     */
-    public static boolean isIccCardActivated(int slot) {
-        TelephonyManager tm = TelephonyManager.getDefault();
-        final int simState = tm.getSimState(slot);
-        return (simState != TelephonyManager.SIM_STATE_ABSENT)
-                && (simState != TelephonyManager.SIM_STATE_UNKNOWN);
+    public static CallMethodInfo getDefaultSimInfo(Context context) {
+        final TelecomManager telecomMgr =
+                (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+        PhoneAccountHandle handle =
+                telecomMgr.getDefaultOutgoingPhoneAccount(PhoneAccount.SCHEME_TEL);
+        if (handle == null) {
+            return null;
+        }
+        return phoneToCallMethod(context, handle);
     }
 
     public static List<CallMethodInfo> getSimInfoList(Context context) {
@@ -40,19 +41,9 @@ public class CallMethodUtils {
         final List<PhoneAccountHandle> accountHandles = telecomMgr.getCallCapablePhoneAccounts();
         ArrayList<CallMethodInfo> callMethodInfoList = new ArrayList<CallMethodInfo>();
         for (PhoneAccountHandle accountHandle : accountHandles) {
-            PhoneAccount phoneAccount = telecomMgr.getPhoneAccount(accountHandle);
-            CallMethodInfo callMethodInfo = new CallMethodInfo();
-            callMethodInfo.mComponent = accountHandle.getComponentName();
-            callMethodInfo.mId = accountHandle.getId();
-            callMethodInfo.mUserHandle = accountHandle.getUserHandle();
-            callMethodInfo.mColor = getPhoneAccountColor(phoneAccount);
-            callMethodInfo.mSubId = Integer.parseInt(accountHandle.getId());
-            callMethodInfo.mSlotId = SubscriptionManager.getSlotId(callMethodInfo.mSubId);
-            callMethodInfo.mName =
-                    getPhoneAccountName(context, phoneAccount, callMethodInfo.mSlotId);
-            callMethodInfo.mIsInCallProvider = false;
-            if (isIccCardActivated(callMethodInfo.mSlotId)) {
-                callMethodInfoList.add(callMethodInfo);
+            CallMethodInfo info = phoneToCallMethod(context, accountHandle);
+            if (info != null) {
+                callMethodInfoList.add(info);
             }
         }
         return callMethodInfoList;
@@ -61,46 +52,52 @@ public class CallMethodUtils {
     private static String getPhoneAccountName(Context context, PhoneAccount phoneAccount,
                                               int slotId) {
         if (phoneAccount == null) {
+            // Slot IDs are zero based
             return context.getString(R.string.call_method_spinner_item_unknown_sim, slotId + 1);
+        } else if (phoneAccount.getLabel() != null) {
+            return phoneAccount.getLabel().toString();
         }
-        return phoneAccount.getLabel().toString();
+        return null;
     }
 
-    private static int getPhoneAccountColor(PhoneAccount phoneAccount) {
-        if (phoneAccount == null) {
-            return NO_COLOR;
-        }
-
-        int highlightColor = phoneAccount.getHighlightColor();
-
-        if (highlightColor != PhoneAccount.NO_HIGHLIGHT_COLOR) {
-            return highlightColor;
+    private static int getPhoneAccountColor(SubscriptionInfo info) {
+        if (info != null) {
+            return info.getIconTint();
         } else {
             return NO_COLOR;
         }
     }
 
-    public static CallMethodInfo getDefaultDataSimInfo(Context context) {
-        SubscriptionManager subMgr = SubscriptionManager.from(context);
-        SubscriptionInfo subInfo = subMgr.getActiveSubscriptionInfo(
-                SubscriptionManager.getDefaultSubId());
-
-        if (subInfo == null) return null;
-
-        CallMethodInfo callMethodInfo = new CallMethodInfo();
-        callMethodInfo.mSubId = subInfo.getSubscriptionId();
-        callMethodInfo.mColor = subInfo.getIconTint();
-        callMethodInfo.mName = subInfo.getDisplayName().toString();
-        callMethodInfo.mSlotId = SubscriptionManager.getSlotId(callMethodInfo.mSubId);
-
+    private static CallMethodInfo phoneToCallMethod(Context context,
+                                                    PhoneAccountHandle phoneAccountHandle) {
+        final SubscriptionManager subMgr = (SubscriptionManager) context
+                .getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
         final TelecomManager telecomMgr =
                 (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
-        final List<PhoneAccountHandle> accountHandles = telecomMgr.getCallCapablePhoneAccounts();
-        for (PhoneAccountHandle accountHandle : accountHandles) {
-            if (callMethodInfo.mSubId == Integer.parseInt(accountHandle.getId())) {
-                callMethodInfo.mComponent = accountHandle.getComponentName();
-                break;
-            }
+        final TelephonyManager telephonyMgr =
+                (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+        PhoneAccount phoneAccount = telecomMgr.getPhoneAccount(phoneAccountHandle);
+
+        if (phoneAccount == null) {
+            return null;
+        }
+
+        CallMethodInfo callMethodInfo = new CallMethodInfo();
+
+        callMethodInfo.mComponent = phoneAccountHandle.getComponentName();
+        callMethodInfo.mId = phoneAccountHandle.getId();
+        callMethodInfo.mUserHandle = phoneAccountHandle.getUserHandle();
+        callMethodInfo.mSubId = telephonyMgr.getSubIdForPhoneAccount(phoneAccount);
+        callMethodInfo.mSlotId = SubscriptionManager.getSlotId(callMethodInfo.mSubId);
+        callMethodInfo.mName = getPhoneAccountName(context, phoneAccount, callMethodInfo.mSlotId);
+        callMethodInfo.mColor =
+                getPhoneAccountColor(subMgr.getActiveSubscriptionInfo(callMethodInfo.mSubId));
+        callMethodInfo.mIsInCallProvider = false;
+
+        final int simState = telephonyMgr.getSimState(callMethodInfo.mSlotId);
+        if ((simState == TelephonyManager.SIM_STATE_ABSENT) ||
+                (simState == TelephonyManager.SIM_STATE_UNKNOWN)) {
+            return null;
         }
 
         return callMethodInfo;

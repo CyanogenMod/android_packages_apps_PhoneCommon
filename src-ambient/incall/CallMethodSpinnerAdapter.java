@@ -57,7 +57,19 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
     @Override
     public void clear() {
         super.clear();
-        mComponentMap.clear();
+        if (mComponentMap != null) {
+            mComponentMap.clear();
+        }
+    }
+
+    /**
+     * Adds the specified call method info at the end of the array.
+     *
+     * @param object The call method info entry to add at the end of the array.
+     */
+    public void add(CallMethodInfo object) {
+        super.add(object);
+        processCallMethod(object);
     }
 
     /**
@@ -149,32 +161,26 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
         } else {
             int drawableId = getIconForSlot(callMethodInfo.mSlotId);
 
-            // if not all calls
-            if (callMethodInfo.mSlotId != -1) {
-                Drawable forground = mContext.getDrawable(drawableId);
-                Drawable background = mContext.getDrawable(R.drawable.ic_sim_backing);
+            Drawable forground = mContext.getDrawable(drawableId);
+            Drawable background = mContext.getDrawable(R.drawable.ic_sim_backing);
 
-                if (callMethodInfo.mColor != NO_COLOR) {
-                    forground.setTint(callMethodInfo.mColor);
-                } else {
-                    forground.setTint(mContext.getResources().getColor(R.color.sim_icon_color));
-                }
-
-                Drawable[] layers = {background, forground};
-                LayerDrawable layerDrawable = new LayerDrawable(layers);
-                icon.setImageDrawable(layerDrawable);
+            if (callMethodInfo.mColor != NO_COLOR) {
+                forground.setTint(callMethodInfo.mColor);
             } else {
-                icon.setImageResource(drawableId);
-                icon.getDrawable().setTint(mContext.getResources().getColor(R.color.sim_icon_color));
-                icon.setBackground(null);
+                forground.setTint(mContext.getResources().getColor(R.color.sim_icon_color));
             }
+
+            Drawable[] layers = {background, forground};
+            LayerDrawable layerDrawable = new LayerDrawable(layers);
+            icon.setImageDrawable(layerDrawable);
         }
     }
 
     public static int getIconForSlot(int slotId) {
         switch (slotId) {
             case -1:
-                return R.drawable.fab_ic_call;
+                // SubscriptionManager.INVALID_SIM_SLOT_INDEX
+                return R.drawable.ic_nosim;
             case 1:
                 return R.drawable.ic_sim_2;
             case 2:
@@ -188,6 +194,20 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
 
     /**
      * Map call method component names to spinner positions.
+     * @param callMethodInfo new call method
+     */
+    private void processCallMethod(CallMethodInfo callMethodInfo) {
+        if (mComponentMap == null) {
+            mComponentMap = new HashMap<String, Integer>();
+        }
+        if (callMethodInfo != null) {
+            String key = getCallMethodKey(callMethodInfo);
+            mComponentMap.put(key, mComponentMap.size());
+        }
+    }
+
+    /**
+     * Map call method component names to spinner positions.
      * @param callMethodInfoList list of current call methods
      */
     private void processCallMethods(Collection<CallMethodInfo> callMethodInfoList) {
@@ -196,8 +216,7 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
         }
         if (callMethodInfoList != null) {
             for (CallMethodInfo info : callMethodInfoList) {
-                String key = getCallMethodKey(info);
-                mComponentMap.put(key, mComponentMap.size());
+                processCallMethod(info);
             }
         }
     }
