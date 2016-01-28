@@ -97,7 +97,7 @@ public class CallMethodHelper {
     private static int callbackCount = 0;
 
     private static final String TAG = CallMethodHelper.class.getSimpleName();
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public interface CallMethodReceiver {
         void onChanged(HashMap<ComponentName, CallMethodInfo> callMethodInfos);
@@ -115,7 +115,7 @@ public class CallMethodHelper {
                 }
                 if (DEBUG) {
                     for (CallMethodInfo cmi : mCallMethodInfos.values()) {
-                        Log.v("BIRD", "Broadcast: " + cmi.mName);
+                        Log.v(TAG, "Broadcast: " + cmi.mName);
                     }
                 }
                 dataHasBeenBroadcastPreviously = true;
