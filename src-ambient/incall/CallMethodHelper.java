@@ -27,9 +27,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.android.phone.common.R;
 import com.android.phone.common.ambient.AmbientConnection;
 import com.android.phone.common.util.StartInCallCallReceiver;
-import com.android.phone.common.R;
 import com.cyanogen.ambient.analytics.Event;
 import com.cyanogen.ambient.common.api.AmbientApiClient;
 import com.cyanogen.ambient.common.api.Result;
@@ -42,6 +43,7 @@ import com.cyanogen.ambient.incall.InCallServices;
 import com.cyanogen.ambient.incall.extension.CreditBalance;
 import com.cyanogen.ambient.incall.extension.CreditInfo;
 import com.cyanogen.ambient.incall.extension.GetCreditInfoResult;
+import com.cyanogen.ambient.incall.extension.IAuthenticationListener;
 import com.cyanogen.ambient.incall.extension.ICallCreditListener;
 import com.cyanogen.ambient.incall.extension.StatusCodes;
 import com.cyanogen.ambient.incall.results.AuthenticationStateResult;
@@ -81,16 +83,14 @@ public class CallMethodHelper {
     private static HashMap<ComponentName, CallMethodInfo> mCallMethodInfos = new HashMap<>();
     private static HashMap<ComponentName, ICallCreditListener> mCallCreditListeners = new
             HashMap<>();
+    private static HashMap<ComponentName, IAuthenticationListener> mAuthenticationListeners = new
+            HashMap<>();
     private static HashMap<String, CallMethodReceiver> mRegisteredClients = new HashMap<>();
     private static boolean dataHasBeenBroadcastPreviously = false;
 
     // To prevent multiple broadcasts and force us to wait for all items to be complete
     // this is the count of callbacks we should get for each item. Increase this if we add more.
     private static int EXPECTED_RESULT_CALLBACKS = 9;
-
-    // To prevent multiple broadcasts and force us to wait for all items to be complete
-    // this is the count of callbacks we should get for each item. Increase this if we add more.
-    private static int EXPECTED_DYNAMIC_RESULT_CALLBACKS = 2;
 
     // Keeps track of the number of callbacks we have from AmbientCore. Reset this to 0
     // immediately after all callbacks are accounted for.
@@ -154,11 +154,21 @@ public class CallMethodHelper {
 
         for (ComponentName callCreditProvider : mCallCreditListeners.keySet()) {
             if (mCallCreditListeners.get(callCreditProvider) == null) {
-               /* CallCreditListenerImpl listener = CallCreditListenerImpl.getInstance
+                CallCreditListenerImpl listener = CallCreditListenerImpl.getInstance
                         (callCreditProvider);
                 getInstance().mInCallApi.addCreditListener(getInstance().mClient,
                         callCreditProvider, listener);
-                mCallCreditListeners.put(callCreditProvider, listener); */
+                mCallCreditListeners.put(callCreditProvider, listener);
+            }
+        }
+
+        for (ComponentName plugin : mAuthenticationListeners.keySet()) {
+            if (mAuthenticationListeners.get(plugin) == null) {
+                AuthenticationListenerImpl listener = AuthenticationListenerImpl.getInstance
+                        (plugin);
+                getInstance().mInCallApi.addAuthenticationListener(getInstance().mClient,
+                        plugin, listener);
+                mAuthenticationListeners.put(plugin, listener);
             }
         }
 
@@ -177,6 +187,13 @@ public class CallMethodHelper {
                 if (mCallCreditListeners.get(callCreditProvider) != null) {
                     getInstance().mInCallApi.removeCreditListener(getInstance().mClient,
                             callCreditProvider, mCallCreditListeners.get(callCreditProvider));
+                }
+            }
+
+            for (ComponentName plugin : mAuthenticationListeners.keySet()) {
+                if (mAuthenticationListeners.get(plugin) != null) {
+                    getInstance().mInCallApi.removeAuthenticationListener(getInstance().mClient,
+                            plugin, mAuthenticationListeners.get(plugin));
                 }
             }
         }
@@ -256,18 +273,6 @@ public class CallMethodHelper {
      */
     public static void refresh() {
         updateCallPlugins();
-    }
-
-    /**
-     * Refresh just the possibly changing items
-     *
-     * This should only be called once dataHasBeenBroadcastPreviously is true.
-     */
-    public static void refreshDynamic() {
-        for(ComponentName cn : mCallMethodInfos.keySet()) {
-            getCreditInfo(cn, true);
-            getCallMethodAuthenticated(cn, true);
-        }
     }
 
     /**
@@ -379,6 +384,18 @@ public class CallMethodHelper {
         }
     }
 
+    public static void updateAuthenticationState(ComponentName name, int state) {
+        CallMethodInfo cmi = getCallMethodIfExists(name);
+        if (cmi != null) {
+            cmi.mIsAuthenticated = state == StatusCodes.AuthenticationState
+                    .LOGGED_IN;
+            mCallMethodInfos.put(name, cmi);
+
+            // Since a CallMethodInfo object was updated here, we should let the subscribers know
+            broadcast();
+        }
+    }
+
     /**
      * Broadcast to subscribers once we know we've gathered all our data. Do not do this until we
      * have everything we need for sure.
@@ -388,20 +405,9 @@ public class CallMethodHelper {
      * and update subscribers.
      */
     private static void maybeBroadcastToSubscribers() {
-        maybeBroadcastToSubscribers(false);
-    }
-
-    private static void maybeBroadcastToSubscribers(boolean broadcastDynamic) {
-        int expectedCount;
-
         ++callbackCount;
-        if (broadcastDynamic) {
-            expectedCount = EXPECTED_DYNAMIC_RESULT_CALLBACKS;
-        } else {
-            expectedCount = EXPECTED_RESULT_CALLBACKS;
-        }
 
-        if (callbackCount == (expectedCount  * mInstalledPlugins.size()))  {
+        if (callbackCount == (EXPECTED_RESULT_CALLBACKS  * mInstalledPlugins.size()))  {
             // we are on the last item. broadcast updated hashmap
             broadcast();
         }
@@ -444,9 +450,9 @@ public class CallMethodHelper {
                     getCallMethodStatus(cn);
                     getCallMethodMimeType(cn);
                     getCallMethodVideoCallableMimeType(cn);
-                    getCallMethodAuthenticated(cn, false);
+                    getCallMethodAuthenticated(cn);
                     getSettingsIntent(cn);
-                    getCreditInfo(cn, false);
+                    getCreditInfo(cn);
                     getManageCreditsIntent(cn);
                     checkLowCreditConfig(cn);
                     // If you add any more callbacks, be sure to update EXPECTED_RESULT_CALLBACKS
@@ -619,8 +625,15 @@ public class CallMethodHelper {
      * Get the Authentication state of the callmethod
      * @param cn
      */
-    private static void getCallMethodAuthenticated(final ComponentName cn,
-                                                   final boolean dynamicRefresh) {
+    private static void getCallMethodAuthenticated(final ComponentName cn) {
+        // Let's attach a listener so that we can continue to listen to any authentication state
+        // changes
+        if (mAuthenticationListeners.get(cn) == null) {
+            AuthenticationListenerImpl listener = AuthenticationListenerImpl.getInstance(cn);
+            getInstance().mInCallApi.addAuthenticationListener(getInstance().mClient, cn, listener);
+            mAuthenticationListeners.put(cn, listener);
+        }
+
         getInstance().mInCallApi.getAuthenticationState(getInstance().mClient, cn)
                 .setResultCallback(new ResultCallback<AuthenticationStateResult>() {
             @Override
@@ -631,7 +644,7 @@ public class CallMethodHelper {
                         cmi.mIsAuthenticated = result.result == StatusCodes.AuthenticationState
                                 .LOGGED_IN;
                         mCallMethodInfos.put(cn, cmi);
-                        maybeBroadcastToSubscribers(dynamicRefresh);
+                        maybeBroadcastToSubscribers();
                     }
                 }
             }
@@ -659,14 +672,14 @@ public class CallMethodHelper {
                 });
     }
 
-    private static void getCreditInfo(final ComponentName cn,
-                                      final boolean dynamicRefresh) {
+    private static void getCreditInfo(final ComponentName cn) {
         // Let's attach a listener so that we can continue to listen to any credit changes
         if (mCallCreditListeners.get(cn) == null) {
-           /* CallCreditListenerImpl listener = CallCreditListenerImpl.getInstance(cn);
+            CallCreditListenerImpl listener = CallCreditListenerImpl.getInstance(cn);
             getInstance().mInCallApi.addCreditListener(getInstance().mClient, cn, listener);
-            mCallCreditListeners.put(cn, listener); */
+            mCallCreditListeners.put(cn, listener);
         }
+
         getInstance().mInCallApi.getCreditInfo(getInstance().mClient, cn)
                 .setResultCallback(new ResultCallback<GetCreditInfoResultResult>() {
                     @Override
@@ -682,7 +695,7 @@ public class CallMethodHelper {
                                 cmi.mProviderCreditInfo = gcir.creditInfo;
                             }
                             mCallMethodInfos.put(cn, cmi);
-                            maybeBroadcastToSubscribers(dynamicRefresh);
+                            maybeBroadcastToSubscribers();
                         }
                     }
                 });
