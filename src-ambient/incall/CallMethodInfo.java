@@ -181,28 +181,8 @@ public class CallMethodInfo {
         List<SubscriptionInfo> subscriptionInfos = ci.subscriptions;
 
         if (subscriptionInfos != null && !subscriptionInfos.isEmpty()) {
-            int subscriptionSize = subscriptionInfos.size();
-            StringBuilder subscripText = new StringBuilder();
-            int extraCount = 0;
-            for (int i = 0; i < subscriptionSize; i++) {
-                SubscriptionInfo si = subscriptionInfos.get(i);
-                if (i >= 3) {
-                    extraCount++;
-                    if (i == subscriptionSize - 1) {
-                        subscripText.append("+" + extraCount);
-                    }
-                } else {
-                    // Region codes should be no larger than three char long the credits bar
-                    // can only show so much.
-                    if (si.regionCode.length() <= 3) {
-                        subscripText.append(si.regionCode);
-                        if (i < subscriptionSize - 1) {
-                            subscripText.append(", ");
-                        }
-                    }
-                }
-            }
-            return subscripText.toString();
+            int size = subscriptionInfos.size();
+            return r.getQuantityString(R.plurals.number_of_incall_subscriptions, size, size);
         } else {
             CreditBalance balance = ci.balance;
             if (balance != null) {
