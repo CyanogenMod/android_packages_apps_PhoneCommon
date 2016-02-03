@@ -294,7 +294,11 @@ public class DialpadView extends LinearLayout {
             @Override
             public void onClick(View view) {
                 try {
-                    p.send();
+                    if (p != null) {
+                        p.send();
+                    } else {
+                        Log.wtf(TAG, "The intent we attempted to fire was null");
+                    }
                 } catch (PendingIntent.CanceledException e) {
                     e.printStackTrace();
                 }

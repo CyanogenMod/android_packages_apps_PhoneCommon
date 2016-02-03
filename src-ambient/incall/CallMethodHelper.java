@@ -90,7 +90,7 @@ public class CallMethodHelper {
 
     // To prevent multiple broadcasts and force us to wait for all items to be complete
     // this is the count of callbacks we should get for each item. Increase this if we add more.
-    private static int EXPECTED_RESULT_CALLBACKS = 9;
+    private static int EXPECTED_RESULT_CALLBACKS = 10;
 
     // Keeps track of the number of callbacks we have from AmbientCore. Reset this to 0
     // immediately after all callbacks are accounted for.
@@ -451,6 +451,7 @@ public class CallMethodHelper {
                     getCallMethodMimeType(cn);
                     getCallMethodVideoCallableMimeType(cn);
                     getCallMethodAuthenticated(cn);
+                    getLoginIntent(cn);
                     getSettingsIntent(cn);
                     getCreditInfo(cn);
                     getManageCreditsIntent(cn);
@@ -753,5 +754,20 @@ public class CallMethodHelper {
                 }
             }
         });
+    }
+
+    private static void getLoginIntent(final ComponentName cn) {
+        getInstance().mInCallApi.getLoginIntent(getInstance().mClient, cn)
+                .setResultCallback(new ResultCallback<PendingIntentResult>() {
+                    @Override
+                    public void onResult(PendingIntentResult pendingIntentResult) {
+                        CallMethodInfo cmi = getCallMethodIfExists(cn);
+                        if (cmi != null) {
+                            cmi.mLoginIntent = pendingIntentResult.intent;
+                            mCallMethodInfos.put(cn, cmi);
+                            maybeBroadcastToSubscribers();
+                        }
+                    }
+                });
     }
 }

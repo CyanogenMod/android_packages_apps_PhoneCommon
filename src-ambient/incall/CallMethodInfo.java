@@ -70,6 +70,7 @@ public class CallMethodInfo {
     public PendingIntent mManageCreditIntent;
     public CreditInfo mProviderCreditInfo;
     public float mCreditWarn = 0.0f;
+    public PendingIntent mLoginIntent;
 
     private static CallMethodInfo sEmergencyCallMethod;
 
@@ -79,7 +80,8 @@ public class CallMethodInfo {
                 mColor, mStatus, mIsAuthenticated, mMimeType, mVideoCallableMimeType,
                 mSubscriptionButtonText, mCreditButtonText, mT9HintDescription, mSettingsIntent,
                 mBrandIcon, mSingleColorBrandIcon, mBadgeIcon, mLoginIcon, mActionOneIcon,
-                mActionTwoIcon, pluginResources, mActionOneText, mActionTwoText, mIsInCallProvider);
+                mActionTwoIcon, pluginResources, mActionOneText, mActionTwoText, mIsInCallProvider,
+                mLoginIntent);
     }
 
     public static final String TAG = "CallMethodInfo";
@@ -116,7 +118,8 @@ public class CallMethodInfo {
                     && Objects.equal(this.pluginResources, info.pluginResources)
                     && Objects.equal(this.mActionOneText, info.mActionOneText)
                     && Objects.equal(this.mActionTwoText, info.mActionTwoText)
-                    && Objects.equal(this.mIsInCallProvider, info.mIsInCallProvider);
+                    && Objects.equal(this.mIsInCallProvider, info.mIsInCallProvider)
+                    && Objects.equal(this.mLoginIntent, info.mLoginIntent);
         }
         return false;
     }
