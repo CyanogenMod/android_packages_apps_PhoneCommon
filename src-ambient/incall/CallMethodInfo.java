@@ -145,6 +145,11 @@ public class CallMethodInfo {
     }
 
     public void placeCall(String origin, String number, Context c, boolean isVideoCall) {
+        placeCall(origin, number, c, isVideoCall, false);
+    }
+
+    public void placeCall(String origin, String number, Context c, boolean isVideoCall,
+                          boolean forcePSTN) {
         StartInCallCallReceiver svcrr = CallMethodHelper.getVoIPResultReceiver(this, origin);
         StartCallRequest request = new StartCallRequest(number, origin, 0, svcrr);
 
@@ -152,7 +157,7 @@ public class CallMethodInfo {
             InCallServices.getInstance().startVideoCall(
                     AmbientConnection.CLIENT.get(c), this.mComponent, request);
         } else {
-            if (PhoneNumberUtils.isGlobalPhoneNumber(number)) {
+            if (PhoneNumberUtils.isGlobalPhoneNumber(number) || forcePSTN) {
                 InCallServices.getInstance().startOutCall(
                         AmbientConnection.CLIENT.get(c), this.mComponent, request);
             } else {

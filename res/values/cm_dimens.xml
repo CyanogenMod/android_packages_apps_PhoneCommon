@@ -19,6 +19,9 @@
     <dimen name="dialpad_key_margin_right">9dp</dimen>
     <dimen name="dialpad_key_number_left_margin">26dp</dimen>
 
+    <dimen name="dialpad_overflow_left_margin">50dp</dimen>
+    <dimen name="dialpad_overflow_left_margin_landscape">36dp</dimen>
+
     <!-- Dimensions for call method spinner and items -->
     <dimen name="call_method_spinner_padding_start">4dp</dimen>
     <dimen name="call_method_spinner_item_default_padding">12dp</dimen>

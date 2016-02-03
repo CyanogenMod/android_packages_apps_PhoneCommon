@@ -269,8 +269,7 @@ public class DialpadView extends LinearLayout {
     public void setCanDigitsBeEdited(boolean canBeEdited) {
         View deleteButton = findViewById(R.id.deleteButton);
         deleteButton.setVisibility(canBeEdited ? View.VISIBLE : View.GONE);
-        View overflowMenuButton = findViewById(R.id.dialpad_overflow);
-        overflowMenuButton.setVisibility(canBeEdited ? View.VISIBLE : View.GONE);
+        mOverflowMenuButton.setVisibility(canBeEdited ? View.VISIBLE : View.GONE);
 
         EditText digits = (EditText) findViewById(R.id.digits);
         digits.setClickable(canBeEdited);
@@ -358,6 +357,14 @@ public class DialpadView extends LinearLayout {
 
     public View getOverflowMenuButton() {
         return mOverflowMenuButton;
+    }
+
+    public void setOverflowMenuButton(ImageButton ib) {
+        if (ib != null) {
+            mOverflowMenuButton.setVisibility(View.GONE);
+        }
+        mOverflowMenuButton = ib;
+
     }
 
     /**
