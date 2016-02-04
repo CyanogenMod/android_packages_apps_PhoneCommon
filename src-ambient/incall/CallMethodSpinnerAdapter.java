@@ -241,9 +241,9 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
      * @return String key for specified CallMethodInfo.
      */
     public static String getCallMethodKey(CallMethodInfo info) {
-        if (info == null || info.mComponent == null) {
+        if (info == null) {
             return null;
         }
-        return info.mComponent.flattenToString() + String.valueOf(info.mSubId);
+        return String.valueOf(info.hashCode());
     }
 }
