@@ -142,6 +142,19 @@ public class CallMethodHelper {
         }
     }
 
+    public static HashMap<ComponentName, CallMethodInfo> getAllEnabledCallMethods() {
+        HashMap<ComponentName, CallMethodInfo> cmi = new HashMap<ComponentName, CallMethodInfo>();
+        for (Map.Entry<ComponentName, CallMethodInfo> entry : getAllCallMethods().entrySet()) {
+            ComponentName key = entry.getKey();
+            CallMethodInfo value = entry.getValue();
+
+            if (value.mStatus == PluginStatus.ENABLED) {
+                cmi.put(key, value);
+            }
+        }
+        return cmi;
+    }
+
     /***
      * Registers the client, on register returns boolean if
      * callMethodInfo data is already collected and the initial broadcast has been sent.
