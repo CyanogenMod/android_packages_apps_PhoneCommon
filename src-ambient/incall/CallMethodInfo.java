@@ -76,12 +76,11 @@ public class CallMethodInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mId, mUserHandle, mComponent, mName, mSummary, mSlotId, mSubId,
-                mColor, mStatus, mIsAuthenticated, mMimeType, mVideoCallableMimeType,
-                mSubscriptionButtonText, mCreditButtonText, mT9HintDescription, mSettingsIntent,
-                mBrandIcon, mSingleColorBrandIcon, mBadgeIcon, mLoginIcon, mActionOneIcon,
-                mActionTwoIcon, pluginResources, mActionOneText, mActionTwoText, mIsInCallProvider,
-                mLoginIntent);
+        return Objects.hashCode(mId, mComponent, mName, mSummary, mSlotId, mSubId, mColor,
+                mMimeType, mVideoCallableMimeType, mSubscriptionButtonText, mCreditButtonText,
+                mT9HintDescription, mSettingsIntent, mBrandIcon, mSingleColorBrandIcon, mBadgeIcon,
+                mLoginIcon, mActionOneIcon, mActionTwoIcon, pluginResources, mActionOneText,
+                mActionTwoText, mIsInCallProvider, mLoginIntent);
     }
 
     public static final String TAG = "CallMethodInfo";
@@ -94,15 +93,12 @@ public class CallMethodInfo {
         if (object instanceof CallMethodInfo) {
             final CallMethodInfo info = (CallMethodInfo) object;
             return Objects.equal(this.mId, info.mId)
-                    && Objects.equal(this.mUserHandle, info.mUserHandle)
                     && Objects.equal(this.mComponent, info.mComponent)
                     && Objects.equal(this.mName, info.mName)
                     && Objects.equal(this.mSummary, info.mSummary)
                     && Objects.equal(this.mSlotId, info.mSlotId)
                     && Objects.equal(this.mSubId, info.mSubId)
                     && Objects.equal(this.mColor, info.mColor)
-                    && Objects.equal(this.mStatus, info.mStatus)
-                    && Objects.equal(this.mIsAuthenticated, info.mIsAuthenticated)
                     && Objects.equal(this.mMimeType, info.mMimeType)
                     && Objects.equal(this.mVideoCallableMimeType, info.mVideoCallableMimeType)
                     && Objects.equal(this.mSubscriptionButtonText, info.mSubscriptionButtonText)
