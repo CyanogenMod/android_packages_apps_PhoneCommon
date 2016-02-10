@@ -23,7 +23,6 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.UserHandle;
 import android.provider.ContactsContract;
-import android.telephony.PhoneNumberUtils;
 import android.telephony.SubscriptionManager;
 import android.util.Log;
 import com.android.phone.common.ambient.AmbientConnection;
@@ -54,6 +53,7 @@ public class CallMethodInfo {
     public boolean mIsAuthenticated;
     public String mMimeType;
     public String mVideoCallableMimeType;
+    public String mImMimeType;
     public String mSubscriptionButtonText;
     public String mCreditButtonText;
     public String mT9HintDescription;
@@ -72,9 +72,31 @@ public class CallMethodInfo {
     public CreditInfo mProviderCreditInfo;
     public float mCreditWarn = 0.0f;
     public PendingIntent mLoginIntent;
-
+    public PendingIntent mDefaultDirectorySearchIntent; // empty contact Uri
+    public PendingIntent mDirectorySearchIntent;
+    public PendingIntent mInviteIntent;
+    public String mAccountType;
     private int mCurrencyAmount;
+    public String mAccountHandle;
+    public int mBrandIconId; // resource ID
+    public int mLoginIconId;
 
+    public ComponentName mNudgeComponent;
+    public String mLoginSubtitle;
+    // Contact login nudge
+    public boolean mLoginNudgeEnable;
+    public String mLoginNudgeTitle;
+    public String mLoginNudgeSubtitle;
+    public String mLoginNudgeActionText;
+    // Contact install nudge
+    public boolean mInstallNudgeEnable;
+    public String mInstallNudgeTitle;
+    public String mInstallNudgeSubtitle;
+    public String mInstallNudgeActionText;
+    public String mDependentPackage;
+    public Drawable mImIcon;
+    public Drawable mVideoIcon;
+    public Drawable mVoiceIcon;
     private static CallMethodInfo sEmergencyCallMethod;
 
     @Override
@@ -83,7 +105,13 @@ public class CallMethodInfo {
                 mMimeType, mVideoCallableMimeType, mSubscriptionButtonText, mCreditButtonText,
                 mT9HintDescription, mSettingsIntent, mBrandIcon, mSingleColorBrandIcon, mBadgeIcon,
                 mLoginIcon, mActionOneIcon, mActionTwoIcon, pluginResources, mActionOneText,
-                mActionTwoText, mIsInCallProvider, mLoginIntent);
+                mActionTwoText, mIsInCallProvider, mLoginIntent, mDefaultDirectorySearchIntent,
+                mDirectorySearchIntent, mInviteIntent, mAccountType, mAccountHandle, mBrandIconId,
+                mLoginIconId, mNudgeComponent, mLoginSubtitle, mLoginNudgeEnable,
+                mLoginNudgeTitle, mLoginNudgeSubtitle, mLoginNudgeActionText,
+                mInstallNudgeEnable, mInstallNudgeTitle, mInstallNudgeSubtitle,
+                mInstallNudgeActionText, mDependentPackage, mImIcon, mVideoIcon, mVoiceIcon,
+                mIsAuthenticated);
     }
 
     public static final String TAG = "CallMethodInfo";
@@ -118,7 +146,29 @@ public class CallMethodInfo {
                     && Objects.equal(this.mActionOneText, info.mActionOneText)
                     && Objects.equal(this.mActionTwoText, info.mActionTwoText)
                     && Objects.equal(this.mIsInCallProvider, info.mIsInCallProvider)
-                    && Objects.equal(this.mLoginIntent, info.mLoginIntent);
+                    && Objects.equal(this.mLoginIntent, info.mLoginIntent)
+                    && Objects.equal(this.mDefaultDirectorySearchIntent,
+                        info.mDefaultDirectorySearchIntent)
+                    && Objects.equal(this.mDirectorySearchIntent, info.mDirectorySearchIntent)
+                    && Objects.equal(this.mInviteIntent, info.mInviteIntent)
+                    && Objects.equal(this.mAccountType, info.mAccountType)
+                    && Objects.equal(this.mAccountHandle, info.mAccountHandle)
+                    && Objects.equal(this.mBrandIconId, info.mBrandIconId)
+                    && Objects.equal(this.mLoginIconId, info.mLoginIconId)
+                    && Objects.equal(this.mNudgeComponent, info.mNudgeComponent)
+                    && Objects.equal(this.mLoginSubtitle, info.mLoginSubtitle)
+                    && Objects.equal(this.mLoginNudgeEnable, info.mLoginNudgeEnable)
+                    && Objects.equal(this.mLoginNudgeTitle, info.mLoginNudgeTitle)
+                    && Objects.equal(this.mLoginNudgeSubtitle, info.mLoginNudgeSubtitle)
+                    && Objects.equal(this.mLoginNudgeActionText, info.mLoginNudgeActionText)
+                    && Objects.equal(this.mInstallNudgeEnable, info.mInstallNudgeEnable)
+                    && Objects.equal(this.mInstallNudgeTitle, info.mInstallNudgeTitle)
+                    && Objects.equal(this.mInstallNudgeSubtitle, info.mInstallNudgeSubtitle)
+                    && Objects.equal(this.mInstallNudgeActionText, info.mInstallNudgeActionText)
+                    && Objects.equal(this.mDependentPackage, info.mDependentPackage)
+                    && Objects.equal(this.mImIcon, info.mImIcon)
+                    && Objects.equal(this.mVideoIcon, info.mVideoIcon)
+                    && Objects.equal(this.mVoiceIcon, info.mVoiceIcon);
         }
         return false;
     }
