@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.UserHandle;
+import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
 import android.telephony.SubscriptionManager;
 import android.util.Log;
@@ -146,11 +147,16 @@ public class CallMethodInfo {
     }
 
     public void placeCall(String origin, String number, Context c, boolean isVideoCall) {
-        placeCall(origin, number, c, isVideoCall, false);
+        placeCall(origin, number, c, isVideoCall, false, null);
+    }
+
+    public void placeCall(String origin, String number, Context c, boolean isVideoCall, boolean
+            forcePSTN) {
+        placeCall(origin, number, c, isVideoCall, forcePSTN, null);
     }
 
     public void placeCall(String origin, String number, Context c, boolean isVideoCall,
-                          boolean forcePSTN) {
+                          boolean forcePSTN, String numberMimeType) {
         StartInCallCallReceiver svcrr = CallMethodHelper.getVoIPResultReceiver(this, origin);
         StartCallRequest request = new StartCallRequest(number, origin, 0, svcrr);
 
@@ -158,7 +164,8 @@ public class CallMethodInfo {
             InCallServices.getInstance().startVideoCall(
                     AmbientConnection.CLIENT.get(c), this.mComponent, request);
         } else {
-            if (PhoneNumberUtils.isGlobalPhoneNumber(number) || forcePSTN) {
+            if (forcePSTN || (numberMimeType != null && numberMimeType.equals(ContactsContract
+                    .CommonDataKinds.Phone.CONTENT_ITEM_TYPE))) {
                 InCallServices.getInstance().startOutCall(
                         AmbientConnection.CLIENT.get(c), this.mComponent, request);
             } else {

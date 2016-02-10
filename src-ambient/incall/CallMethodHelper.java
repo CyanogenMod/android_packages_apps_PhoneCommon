@@ -155,6 +155,15 @@ public class CallMethodHelper {
         return cmi;
     }
 
+    public static CallMethodInfo getMethodForMimeType(String mimeType) {
+        for (CallMethodInfo entry : getAllCallMethods().values()) {
+            if (entry.mMimeType.equals(mimeType)) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
     /***
      * Registers the client, on register returns boolean if
      * callMethodInfo data is already collected and the initial broadcast has been sent.
