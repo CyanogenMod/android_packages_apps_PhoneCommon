@@ -72,6 +72,8 @@ public class CallMethodInfo {
     public float mCreditWarn = 0.0f;
     public PendingIntent mLoginIntent;
 
+    private int mCurrencyAmount;
+
     private static CallMethodInfo sEmergencyCallMethod;
 
     @Override
@@ -166,10 +168,6 @@ public class CallMethodInfo {
         }
     }
 
-    private boolean isSubscription;
-    private boolean isCredits;
-    private int mCurrencyAmmount;
-
     public String getCreditsDescriptionText(Resources r) {
         String ret = null;
         CreditInfo ci =  this.mProviderCreditInfo;
@@ -182,11 +180,11 @@ public class CallMethodInfo {
         } else {
             CreditBalance balance = ci.balance;
             if (balance != null) {
-                mCurrencyAmmount = (int) balance.balance;
+                mCurrencyAmount = (int) balance.balance;
                 try {
                     if (balance.currencyCode != null) {
                         Currency currencyCode = Currency.getInstance(balance.currencyCode);
-                        BigDecimal availableCredit = BigDecimal.valueOf(mCurrencyAmmount,
+                        BigDecimal availableCredit = BigDecimal.valueOf(mCurrencyAmount,
                                 currencyCode.getDefaultFractionDigits());
 
 
@@ -212,14 +210,11 @@ public class CallMethodInfo {
     }
 
     public boolean usesSubscriptions() {
-        return isSubscription;
-    }
-
-    public boolean usesCurrency() {
-        return isCredits;
+        List<SubscriptionInfo> subscriptionInfos = this.mProviderCreditInfo.subscriptions;
+        return subscriptionInfos != null && !subscriptionInfos.isEmpty();
     }
 
     public int getCurrencyAmount() {
-        return mCurrencyAmmount;
+        return mCurrencyAmount;
     }
 }
