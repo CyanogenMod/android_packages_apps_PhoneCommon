@@ -113,6 +113,7 @@ public class CallMethodHelper {
                 for (CallMethodReceiver client : mRegisteredClients.values()) {
                     client.onChanged(mCallMethodInfos);
                 }
+                enableListeners();
                 if (DEBUG) {
                     for (CallMethodInfo cmi : mCallMethodInfos.values()) {
                         Log.v(TAG, "Broadcast: " + cmi.mName);
@@ -122,6 +123,44 @@ public class CallMethodHelper {
                 callbackCount = 0;
             }
         });
+    }
+
+    private static void enableListeners() {
+        Log.d(TAG, "Enabling Listeners");
+        for (ComponentName callProviders : mCallMethodInfos.keySet()) {
+            if (!mCallCreditListeners.containsKey(callProviders)) {
+                CallCreditListenerImpl listener =
+                        CallCreditListenerImpl.getInstance(callProviders);
+                getInstance().mInCallApi.addCreditListener(getInstance().mClient, callProviders,
+                        listener);
+                mCallCreditListeners.put(callProviders, listener);
+            }
+            if (!mAuthenticationListeners.containsKey(callProviders)) {
+                AuthenticationListenerImpl listener =
+                        AuthenticationListenerImpl.getInstance(callProviders);
+                getInstance().mInCallApi.addAuthenticationListener(getInstance().mClient,
+                        callProviders, listener);
+                mAuthenticationListeners.put(callProviders, listener);
+            }
+        }
+    }
+
+    private static void disableListeners() {
+        Log.d(TAG, "Disabling Listeners");
+        for(ComponentName callCreditProvider : mCallCreditListeners.keySet()) {
+            if (mCallCreditListeners.get(callCreditProvider) != null) {
+                getInstance().mInCallApi.removeCreditListener(getInstance().mClient,
+                        callCreditProvider, mCallCreditListeners.get(callCreditProvider));
+            }
+        }
+        for (ComponentName plugin : mAuthenticationListeners.keySet()) {
+            if (mAuthenticationListeners.get(plugin) != null) {
+                getInstance().mInCallApi.removeAuthenticationListener(getInstance().mClient,
+                        plugin, mAuthenticationListeners.get(plugin));
+            }
+        }
+        mCallCreditListeners.clear();
+        mAuthenticationListeners.clear();
     }
 
     /**
@@ -144,7 +183,7 @@ public class CallMethodHelper {
 
     public static HashMap<ComponentName, CallMethodInfo> getAllEnabledCallMethods() {
         HashMap<ComponentName, CallMethodInfo> cmi = new HashMap<ComponentName, CallMethodInfo>();
-        for (Map.Entry<ComponentName, CallMethodInfo> entry : getAllCallMethods().entrySet()) {
+        for (Map.Entry<ComponentName, CallMethodInfo> entry : mCallMethodInfos.entrySet()) {
             ComponentName key = entry.getKey();
             CallMethodInfo value = entry.getValue();
 
@@ -156,7 +195,7 @@ public class CallMethodHelper {
     }
 
     public static CallMethodInfo getMethodForMimeType(String mimeType) {
-        for (CallMethodInfo entry : getAllCallMethods().values()) {
+        for (CallMethodInfo entry : mCallMethodInfos.values()) {
             if (entry.mMimeType.equals(mimeType)) {
                 return entry;
             }
@@ -174,26 +213,6 @@ public class CallMethodHelper {
     public static synchronized boolean subscribe(String id, CallMethodReceiver cmr) {
         mRegisteredClients.put(id, cmr);
 
-        for (ComponentName callCreditProvider : mCallCreditListeners.keySet()) {
-            if (mCallCreditListeners.get(callCreditProvider) == null) {
-                CallCreditListenerImpl listener = CallCreditListenerImpl.getInstance
-                        (callCreditProvider);
-                getInstance().mInCallApi.addCreditListener(getInstance().mClient,
-                        callCreditProvider, listener);
-                mCallCreditListeners.put(callCreditProvider, listener);
-            }
-        }
-
-        for (ComponentName plugin : mAuthenticationListeners.keySet()) {
-            if (mAuthenticationListeners.get(plugin) == null) {
-                AuthenticationListenerImpl listener = AuthenticationListenerImpl.getInstance
-                        (plugin);
-                getInstance().mInCallApi.addAuthenticationListener(getInstance().mClient,
-                        plugin, listener);
-                mAuthenticationListeners.put(plugin, listener);
-            }
-        }
-
         return dataHasBeenBroadcastPreviously;
     }
 
@@ -203,22 +222,7 @@ public class CallMethodHelper {
      */
     public static synchronized void unsubscribe(String id) {
         mRegisteredClients.remove(id);
-
-        if (mRegisteredClients.size() == 0) {
-            for (ComponentName callCreditProvider : mCallCreditListeners.keySet()) {
-                if (mCallCreditListeners.get(callCreditProvider) != null) {
-                    getInstance().mInCallApi.removeCreditListener(getInstance().mClient,
-                            callCreditProvider, mCallCreditListeners.get(callCreditProvider));
-                }
-            }
-
-            for (ComponentName plugin : mAuthenticationListeners.keySet()) {
-                if (mAuthenticationListeners.get(plugin) != null) {
-                    getInstance().mInCallApi.removeAuthenticationListener(getInstance().mClient,
-                            plugin, mAuthenticationListeners.get(plugin));
-                }
-            }
-        }
+        disableListeners();
     }
 
     /**
@@ -317,7 +321,18 @@ public class CallMethodHelper {
      * @return the current HashMap of CMIs.
      */
     public static HashMap<ComponentName, CallMethodInfo> getAllCallMethods() {
+        // after the initial broadcast on resume we need to go and get some new data
+        // this data will broadcast as soon as it becomes available
+        refreshDynamicItems();
         return mCallMethodInfos;
+    }
+
+    public static void refreshDynamicItems() {
+        enableListeners();
+        for (ComponentName cn : mCallMethodInfos.keySet()) {
+            getCallMethodAuthenticated(cn, true);
+            getCreditInfo(cn, true);
+        }
     }
 
     /**
@@ -472,10 +487,10 @@ public class CallMethodHelper {
                     getCallMethodStatus(cn);
                     getCallMethodMimeType(cn);
                     getCallMethodVideoCallableMimeType(cn);
-                    getCallMethodAuthenticated(cn);
+                    getCallMethodAuthenticated(cn, false);
                     getLoginIntent(cn);
                     getSettingsIntent(cn);
-                    getCreditInfo(cn);
+                    getCreditInfo(cn, false);
                     getManageCreditsIntent(cn);
                     checkLowCreditConfig(cn);
                     // If you add any more callbacks, be sure to update EXPECTED_RESULT_CALLBACKS
@@ -648,15 +663,8 @@ public class CallMethodHelper {
      * Get the Authentication state of the callmethod
      * @param cn
      */
-    private static void getCallMethodAuthenticated(final ComponentName cn) {
-        // Let's attach a listener so that we can continue to listen to any authentication state
-        // changes
-        if (mAuthenticationListeners.get(cn) == null) {
-            AuthenticationListenerImpl listener = AuthenticationListenerImpl.getInstance(cn);
-            getInstance().mInCallApi.addAuthenticationListener(getInstance().mClient, cn, listener);
-            mAuthenticationListeners.put(cn, listener);
-        }
-
+    private static void getCallMethodAuthenticated(final ComponentName cn,
+                                                   final boolean broadcastASAP) {
         getInstance().mInCallApi.getAuthenticationState(getInstance().mClient, cn)
                 .setResultCallback(new ResultCallback<AuthenticationStateResult>() {
             @Override
@@ -667,7 +675,11 @@ public class CallMethodHelper {
                         cmi.mIsAuthenticated = result.result == StatusCodes.AuthenticationState
                                 .LOGGED_IN;
                         mCallMethodInfos.put(cn, cmi);
-                        maybeBroadcastToSubscribers();
+                        if (broadcastASAP) {
+                            broadcast();
+                        } else {
+                            maybeBroadcastToSubscribers();
+                        }
                     }
                 }
             }
@@ -695,14 +707,7 @@ public class CallMethodHelper {
                 });
     }
 
-    private static void getCreditInfo(final ComponentName cn) {
-        // Let's attach a listener so that we can continue to listen to any credit changes
-        if (mCallCreditListeners.get(cn) == null) {
-            CallCreditListenerImpl listener = CallCreditListenerImpl.getInstance(cn);
-            getInstance().mInCallApi.addCreditListener(getInstance().mClient, cn, listener);
-            mCallCreditListeners.put(cn, listener);
-        }
-
+    private static void getCreditInfo(final ComponentName cn, final boolean broadcastASAP) {
         getInstance().mInCallApi.getCreditInfo(getInstance().mClient, cn)
                 .setResultCallback(new ResultCallback<GetCreditInfoResultResult>() {
                     @Override
@@ -718,7 +723,11 @@ public class CallMethodHelper {
                                 cmi.mProviderCreditInfo = gcir.creditInfo;
                             }
                             mCallMethodInfos.put(cn, cmi);
-                            maybeBroadcastToSubscribers();
+                            if (broadcastASAP) {
+                                broadcast();
+                            } else {
+                                maybeBroadcastToSubscribers();
+                            }
                         }
                     }
                 });
