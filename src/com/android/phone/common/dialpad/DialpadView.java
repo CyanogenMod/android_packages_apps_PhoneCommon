@@ -280,32 +280,6 @@ public class DialpadView extends LinearLayout {
         mCanDigitsBeEdited = canBeEdited;
     }
 
-    public void setCallRateInformation(String countryName, String displayRate,
-                                       final PendingIntent p) {
-        if (TextUtils.isEmpty(countryName) && TextUtils.isEmpty(displayRate) &&
-                p == null) {
-            mRateContainer.setVisibility(View.GONE);
-            return;
-        }
-        mRateContainer.setVisibility(View.VISIBLE);
-        mIldCountry.setText(countryName);
-        mIldRate.setText(displayRate);
-        mIldRate.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    if (p != null) {
-                        p.send();
-                    } else {
-                        Log.wtf(TAG, "The intent we attempted to fire was null");
-                    }
-                } catch (PendingIntent.CanceledException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
     public boolean canDigitsBeEdited() {
         return mCanDigitsBeEdited;
     }
@@ -511,5 +485,9 @@ public class DialpadView extends LinearLayout {
         overrideConfig.setLocale(locale);
         Context localeContext = getContext().createConfigurationContext(overrideConfig);
         return localeContext.getResources();
+    }
+
+    public ViewGroup getRateContainer() {
+        return mRateContainer;
     }
 }
