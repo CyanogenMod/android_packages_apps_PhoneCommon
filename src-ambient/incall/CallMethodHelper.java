@@ -327,7 +327,6 @@ public class CallMethodHelper {
     public static HashMap<ComponentName, CallMethodInfo> getAllCallMethods() {
         // after the initial broadcast on resume we need to go and get some new data
         // this data will broadcast as soon as it becomes available
-        refreshDynamicItems();
         return mCallMethodInfos;
     }
 
