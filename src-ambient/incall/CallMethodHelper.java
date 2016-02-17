@@ -25,6 +25,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -196,8 +197,11 @@ public class CallMethodHelper {
 
     public static CallMethodInfo getMethodForMimeType(String mimeType) {
         for (CallMethodInfo entry : mCallMethodInfos.values()) {
-            if (entry.mMimeType.equals(mimeType)) {
-                return entry;
+            // TODO: find out why mimetype may be null
+            if (!TextUtils.isEmpty(entry.mMimeType)) {
+                if (entry.mMimeType.equals(mimeType)) {
+                    return entry;
+                }
             }
         }
         return null;
