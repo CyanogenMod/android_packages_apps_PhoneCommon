@@ -19,5 +19,5 @@
 <resources>
   <string name="callFailed_dialToUssd">DIAL-begäran ändrades till USSD-begäran.</string>
   <string name="callFailed_dialToSs">DIAL-begäran ändrades till SS-begäran.</string>
-  <string name="callFailed_dialToDial">DIAL-begäran ändrades till DIAL-begäran med annat nummer.</string>
+  <string name="callFailed_dialToDial">SAMTALS-begäran ändrades till en SAMTALS-begäran med annat nummer.</string>
 </resources>
