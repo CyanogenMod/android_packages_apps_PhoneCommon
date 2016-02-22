@@ -28,6 +28,7 @@
     <LinearLayout
         android:id="@+id/rate_container"
         android:layout_width="match_parent"
+        android:background="@color/credit_banner_background"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone">
@@ -53,6 +54,7 @@
                 <TextView android:id="@+id/ild_country"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/credit_banner_text"
                     android:layout_gravity="start" />
 
             </LinearLayout>
@@ -70,6 +72,7 @@
                      android:layout_height="wrap_content"
                      android:layout_marginStart="4dp"
                      android:textStyle="bold"
+                     android:textColor="@color/credit_banner_text"
                      android:layout_gravity="end" />
 
             </LinearLayout>
