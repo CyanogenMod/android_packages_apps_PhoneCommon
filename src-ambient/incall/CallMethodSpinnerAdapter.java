@@ -41,6 +41,7 @@ import static com.cyanogen.ambient.incall.util.InCallHelper.NO_COLOR;
 public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
         implements SpinnerAdapter {
     private static final String TAG = CallMethodSpinnerAdapter.class.getSimpleName();
+    public static final int POSITION_UNKNOWN = -1;
 
     private final Context mContext;
     private Map<String, Integer> mComponentMap;
@@ -224,13 +225,13 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
     /**
      * Returns the position of the specified component within the spinner
      * @param key String key for call method lookup
-     * @return Position of specified component, 0 if not found.
+     * @return Position of specified component, POSITION_UNKNOWN if not found.
      */
     public int getPosition(String key) {
-        int position = 0;
+        int position = POSITION_UNKNOWN;
         if (!TextUtils.isEmpty(key)) {
             position = mComponentMap.containsKey(key) ?
-                    mComponentMap.get(key) : 0;
+                    mComponentMap.get(key) : POSITION_UNKNOWN;
         }
         return position;
     }
