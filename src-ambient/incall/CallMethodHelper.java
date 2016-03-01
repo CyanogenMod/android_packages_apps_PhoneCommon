@@ -780,8 +780,15 @@ public class CallMethodHelper {
                     if (bundleResult != null && bundleResult.bundle != null &&
                             bundleResult.bundle.containsKey(NudgeKey
                                     .INCALL_PARAM_CREDIT_WARN)) {
-                        cmi.mCreditWarn = bundleResult.bundle.getFloat(NudgeKey
+                        Object creditWarn = bundleResult.bundle.get(NudgeKey
                                 .INCALL_PARAM_CREDIT_WARN);
+                        if (creditWarn.getClass().equals(Integer.class)) {
+                            cmi.mCreditWarn = (Integer) creditWarn;
+                        } else if (creditWarn.getClass().equals(Float.class)) {
+                            cmi.mCreditWarn = (Float) creditWarn;
+                        } else {
+                            Log.e(TAG, "Invalid value for Credit Warn limit: " + creditWarn);
+                        }
                         mCallMethodInfos.put(pluginComponent, cmi);
                     }
                     maybeBroadcastToSubscribers();
