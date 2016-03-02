@@ -624,18 +624,17 @@ public class CallMethodHelper {
                                         pluginResources.getDrawable(icpi.getActionOneIcon(), null);
                                 cmi.mActionTwoIcon =
                                         pluginResources.getDrawable(icpi.getActionTwoIcon(), null);
-
-                                cmi.mBrandIconId = icpi.getBrandIcon();
                                 cmi.mBrandIcon =
                                         pluginResources.getDrawable(icpi.getBrandIcon(), null);
-                                cmi.mLoginIconId = icpi.getLoginIcon();
-                                cmi.mLoginIcon = pluginResources.getDrawable(icpi.getLoginIcon(),
-                                        null);
+                                cmi.mLoginIcon =
+                                        pluginResources.getDrawable(icpi.getLoginIcon(), null);
                                 cmi.mVoiceIcon = pluginResources.getDrawable(icpi
                                         .getVoiceMimeIcon(), null);
                                 cmi.mVideoIcon = pluginResources.getDrawable(icpi
                                         .getVideoMimeIcon(), null);
                                 cmi.mImIcon = pluginResources.getDrawable(icpi.getImMimeIcon(),
+                                        null);
+                                cmi.mBadgeIcon = pluginResources.getDrawable(icpi.getBadgeIcon(),
                                         null);
 
                             } catch (Resources.NotFoundException e) {
@@ -668,6 +667,8 @@ public class CallMethodHelper {
                                 }
                             }
                             cmi.mBrandIconId = icpi.getBrandIcon();
+                            cmi.mLoginIconId = icpi.getLoginIcon();
+
                             cmi.mAccountType = icpi.getAccountType();
                             mCallMethodInfos.put(cn, cmi);
                             maybeBroadcastToSubscribers();
@@ -789,14 +790,6 @@ public class CallMethodHelper {
      */
     protected static void getCallMethodAuthenticated(final ComponentName cn,
             final boolean broadcastASAP) {
-        // Let's attach a listener so that we can continue to listen to any authentication state
-        // changes
-        if (mAuthenticationListeners.get(cn) == null) {
-            AuthenticationListenerImpl listener = AuthenticationListenerImpl.getInstance(cn);
-            getInstance().mInCallApi.addAuthenticationListener(getInstance().mClient, cn, listener);
-            mAuthenticationListeners.put(cn, listener);
-        }
-
         getInstance().mInCallApi.getAuthenticationState(getInstance().mClient, cn)
                 .setResultCallback(new ResultCallback<AuthenticationStateResult>() {
             @Override
