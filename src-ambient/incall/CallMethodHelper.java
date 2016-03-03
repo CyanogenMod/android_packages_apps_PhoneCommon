@@ -41,6 +41,7 @@ import com.android.phone.common.ambient.AmbientConnection;
 import com.android.phone.common.util.StartInCallCallReceiver;
 import com.cyanogen.ambient.analytics.Event;
 import com.cyanogen.ambient.common.api.AmbientApiClient;
+import com.cyanogen.ambient.common.api.PendingResult;
 import com.cyanogen.ambient.common.api.Result;
 import com.cyanogen.ambient.common.api.ResultCallback;
 import com.cyanogen.ambient.discovery.NudgeServices;
@@ -55,6 +56,7 @@ import com.cyanogen.ambient.incall.extension.IAuthenticationListener;
 import com.cyanogen.ambient.incall.extension.ICallCreditListener;
 import com.cyanogen.ambient.incall.extension.InCallContactInfo;
 import com.cyanogen.ambient.incall.extension.StatusCodes;
+import com.cyanogen.ambient.incall.results.AccountHandleResult;
 import com.cyanogen.ambient.incall.results.AuthenticationStateResult;
 import com.cyanogen.ambient.incall.results.GetCreditInfoResultResult;
 import com.cyanogen.ambient.incall.results.InCallProviderInfoResult;
@@ -99,14 +101,6 @@ public class CallMethodHelper {
             HashMap<>();
     protected static HashMap<String, CallMethodReceiver> mRegisteredClients = new HashMap<>();
     protected static boolean dataHasBeenBroadcastPreviously = false;
-    // To prevent multiple broadcasts and force us to wait for all items to be complete
-    // this is the count of callbacks we should get for each item. Increase this if we add more.
-    private static int EXPECTED_RESULT_CALLBACKS = 10;
-    protected static int expectedCallbacks = EXPECTED_RESULT_CALLBACKS;
-
-    // Keeps track of the number of callbacks we have from AmbientCore. Reset this to 0
-    // immediately after all callbacks are accounted for.
-    private static int callbackCount = 0;
     // determine which info types to load
     protected static final String TAG = CallMethodHelper.class.getSimpleName();
     protected static final boolean DEBUG = false;
@@ -118,7 +112,7 @@ public class CallMethodHelper {
     /**
      * Broadcasts mCallMethodInfos to all registered clients on the Main thread.
      */
-    protected static void broadcast(final boolean asap) {
+    protected static void broadcast() {
         getInstance().mMainHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -132,10 +126,7 @@ public class CallMethodHelper {
                         Log.v(TAG, "Broadcast: " + cmi.mName);
                     }
                 }
-                if (!asap) {
-                    dataHasBeenBroadcastPreviously = true;
-                    callbackCount = 0;
-                }
+                dataHasBeenBroadcastPreviously = true;
             }
         });
     }
@@ -370,8 +361,11 @@ public class CallMethodHelper {
     public static void refreshDynamicItems() {
         enableListeners();
         for (ComponentName cn : mCallMethodInfos.keySet()) {
-            getCallMethodAuthenticated(cn, true);
-            getCreditInfo(cn, true);
+            HashMap<ResultCallback, PendingResult> apiCallbacks = new HashMap<ResultCallback,
+                    PendingResult>();
+            getCallMethodAuthenticated(cn, apiCallbacks);
+            getCreditInfo(cn, apiCallbacks);
+            executeAll(apiCallbacks);
         }
     }
 
@@ -477,7 +471,7 @@ public class CallMethodHelper {
             }
 
             // Since a CallMethodInfo object was updated here, we should let the subscribers know
-            broadcast(true);
+            broadcast();
         }
     }
 
@@ -489,7 +483,7 @@ public class CallMethodHelper {
             mCallMethodInfos.put(name, cmi);
 
             // Since a CallMethodInfo object was updated here, we should let the subscribers know
-            broadcast(true);
+            broadcast();
         }
     }
 
@@ -501,14 +495,16 @@ public class CallMethodHelper {
      * the callbacks, once we have accounted for all callbacks from all plugins, we can go ahead
      * and update subscribers.
      */
-    protected static void maybeBroadcastToSubscribers() {
-        ++callbackCount;
-
+    protected static void maybeBroadcastToSubscribers(ResultCallback callback,
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        if (callback != null) {
+            apiCallbacks.remove(callback);
+        }
         if (DEBUG) Log.d(TAG, "maybeBroadcastToSubscribers: mInstalledPugins:" + mInstalledPlugins
                 .size());
-        if (callbackCount == (expectedCallbacks  * mInstalledPlugins.size()))  {
+        if (apiCallbacks.isEmpty())  {
             // we are on the last item. broadcast updated hashmap
-            broadcast(false);
+            broadcast();
         }
     }
 
@@ -541,32 +537,75 @@ public class CallMethodHelper {
                 mCallMethodInfos.clear();
 
                 if (mInstalledPlugins.size() == 0) {
-                    broadcast(false);
+                    broadcast();
                 }
 
                 for (ComponentName cn : mInstalledPlugins) {
+                    HashMap<ResultCallback, PendingResult> apiCallbacks =
+                            new HashMap<ResultCallback, PendingResult>();
                     mCallMethodInfos.put(cn, new CallMethodInfo());
-                    getCallMethodInfo(cn);
-                    getCallMethodStatus(cn);
-                    getCallMethodMimeType(cn);
-                    getCallMethodVideoCallableMimeType(cn);
-                    getCallMethodAuthenticated(cn, false);
-                    getLoginIntent(cn);
-                    getSettingsIntent(cn);
-                    getCreditInfo(cn, false);
-                    getManageCreditsIntent(cn);
-                    checkLowCreditConfig(cn);
-                    // If you add any more callbacks, be sure to update EXPECTED_RESULT_CALLBACKS
-                    // and EXPECTED_DYNAMIC_RESULT_CALLBACKS if the callback is dynamic
-                    // with the proper count.
+                    getCallMethodInfo(cn, apiCallbacks);
+                    getCallMethodStatus(cn, apiCallbacks);
+                    getCallMethodMimeType(cn, apiCallbacks);
+                    getCallMethodVideoCallableMimeType(cn, apiCallbacks);
+                    getCallMethodAuthenticated(cn, apiCallbacks);
+                    getLoginIntent(cn, apiCallbacks);
+                    getSettingsIntent(cn, apiCallbacks);
+                    getCreditInfo(cn, apiCallbacks);
+                    getManageCreditsIntent(cn, apiCallbacks);
+                    checkLowCreditConfig(cn, apiCallbacks);
+                    executeAll(apiCallbacks);
                 }
             }
         });
     }
 
-    protected static void getCallMethodInfo(final ComponentName cn) {
-        getInstance().mInCallApi.getProviderInfo(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<InCallProviderInfoResult>() {
+    protected static void executeAll(HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        for (ResultCallback resultCallback : apiCallbacks.keySet()) {
+            PendingResult pendingResult = apiCallbacks.get(resultCallback);
+            pendingResult.setResultCallback(resultCallback);
+        }
+    }
+
+    /*
+     * Look up the currently logged in plugin account in case plugin fails to return a valid
+     * account handle
+     */
+    private static String lookupAccountHandle(ComponentName cn, String targetAccountType) {
+        // Gather account handles logged into the device as a backup, in case
+        // plugins fail to return the account handle even when it reports its
+        // state as authenticated
+        AccountTypeManager accountTypes = AccountTypeManager.getInstance(getInstance().mContext);
+        List<AccountWithDataSet> accounts = accountTypes.getAccounts(false);
+        ArrayMap<String, String> accountMap = new ArrayMap<String, String>();
+
+        for (AccountWithDataSet account : accounts) {
+            AccountType accountType =
+                    accountTypes.getAccountType(account.type, account.dataSet);
+            if (accountType.isExtension() &&
+                    !account.hasData(getInstance().mContext)) {
+                // Hide extensions with no raw_contacts.
+                continue;
+            }
+            if (DEBUG) {
+                Log.d(TAG, "account.type: " + account.type + "account.name: " + account.name);
+            }
+            // currently only handle one account per account type use case
+            accountMap.put(account.type, account.name);
+        }
+        return accountMap.containsKey(targetAccountType) ? accountMap.get(targetAccountType) : "";
+    }
+
+    /**
+     * Get the plugin info
+     * @param cn
+     * @param apiCallbacks keeps track of the target callbacks before broadcast
+     */
+    protected static void getCallMethodInfo(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getProviderInfo(getInstance()
+                .mClient, cn);
+        ResultCallback callback = new ResultCallback<InCallProviderInfoResult>() {
                     @Override
                     public void onResult(InCallProviderInfoResult inCallProviderInfoResult) {
                         InCallProviderInfo icpi = inCallProviderInfoResult.inCallProviderInfo;
@@ -584,29 +623,6 @@ public class CallMethodHelper {
                             Log.e(TAG, "Plugin isn't installed: " + cn);
                             mCallMethodInfos.remove(cn);
                             return;
-                        }
-
-                        // Gather account handles logged into the device as a backup, in case
-                        // plugins fail to return the account handle even when it reports its
-                        // state as authenticated
-                        AccountTypeManager accountTypes = AccountTypeManager.getInstance
-                                (getInstance().mContext);
-                        List<AccountWithDataSet> accounts = accountTypes.getAccounts(false);
-                        ArrayMap<String, String> accountMap = new ArrayMap<String, String>();
-
-                        for (AccountWithDataSet account : accounts) {
-                            AccountType accountType =
-                                    accountTypes.getAccountType(account.type, account.dataSet);
-                            if (accountType.isExtension() &&
-                                    !account.hasData(getInstance().mContext)) {
-                                // Hide extensions with no raw_contacts.
-                                continue;
-                            }
-                            if (DEBUG)
-                                Log.d(TAG, "account.type: " + account.type + "account.name: " +
-                                        account.name);
-                            // currently only handle one account per account type use case
-                            accountMap.put(account.type, account.name);
                         }
 
                         synchronized (mCallMethodInfos) {
@@ -662,40 +678,42 @@ public class CallMethodHelper {
                             cmi.mAccountType = icpi.getAccountType();
                             cmi.mAccountHandle = icpi.getAccountHandle();
                             if (TextUtils.isEmpty(cmi.mAccountHandle)) {
-                                if (accountMap.containsKey(cmi.mAccountType)) {
-                                    cmi.mAccountHandle = accountMap.get(cmi.mAccountHandle);
-                                }
+                                cmi.mAccountHandle = lookupAccountHandle(cn, cmi.mAccountType);
                             }
                             cmi.mBrandIconId = icpi.getBrandIcon();
                             cmi.mLoginIconId = icpi.getLoginIcon();
 
                             cmi.mAccountType = icpi.getAccountType();
                             mCallMethodInfos.put(cn, cmi);
-                            maybeBroadcastToSubscribers();
+                            maybeBroadcastToSubscribers(this, apiCallbacks);
                         }
                     }
-                });
+                };
+        apiCallbacks.put(callback, result);
     }
 
     /**
      * Get our plugin enabled status
      * @param cn
+     * @param apiCallbacks keeps track of the target callbacks before broadcast
      */
-    protected static void getCallMethodStatus(final ComponentName cn) {
-        getInstance().mInCallApi.getPluginStatus(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<PluginStatusResult>() {
-            @Override
-            public void onResult(PluginStatusResult pluginStatusResult) {
-                synchronized (mCallMethodInfos) {
-                    CallMethodInfo cmi = getCallMethodIfExists(cn);
-                    if (cmi != null) {
-                        cmi.mStatus = pluginStatusResult.status;
-                        mCallMethodInfos.put(cn, cmi);
-                        maybeBroadcastToSubscribers();
+    protected static void getCallMethodStatus(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getPluginStatus(getInstance().mClient, cn);
+        ResultCallback callback = new ResultCallback<PluginStatusResult>() {
+                @Override
+                public void onResult(PluginStatusResult pluginStatusResult) {
+                    synchronized (mCallMethodInfos) {
+                        CallMethodInfo cmi = getCallMethodIfExists(cn);
+                        if (cmi != null) {
+                            cmi.mStatus = pluginStatusResult.status;
+                            mCallMethodInfos.put(cn, cmi);
+                            maybeBroadcastToSubscribers(this, apiCallbacks);
+                        }
                     }
                 }
-            }
-        });
+            };
+        apiCallbacks.put(callback, result);
     }
 
     /**
@@ -712,86 +730,100 @@ public class CallMethodHelper {
         }
         getInstance().mInCallApi.sendAnalyticsEventToPlugin(getInstance().mClient, cn, e)
                 .setResultCallback(new ResultCallback<Result>() {
-            @Override
-            public void onResult(Result result) {
-                if (DEBUG) {
-                    Log.v(TAG, "Event sent with result: " + result.getStatus().getStatusMessage());
-                }
-            }
-        });
-    }
-
-    /**
-     * Get the call method mime type
-     * @param cn
-     */
-    protected static void getCallMethodMimeType(final ComponentName cn) {
-        getInstance().mInCallApi.getCallableMimeType(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<MimeTypeResult>() {
-            @Override
-            public void onResult(MimeTypeResult mimeTypeResult) {
-                synchronized (mCallMethodInfos) {
-                    CallMethodInfo cmi = getCallMethodIfExists(cn);
-                    if (cmi != null) {
-                        cmi.mMimeType = mimeTypeResult.mimeType;
-                        mCallMethodInfos.put(cn, cmi);
-                        maybeBroadcastToSubscribers();
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * Get the call method mime type
-     * @param cn
-     */
-    protected static void getCallMethodVideoCallableMimeType(final ComponentName cn) {
-        getInstance().mInCallApi.getVideoCallableMimeType(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<MimeTypeResult>() {
                     @Override
-                    public void onResult(MimeTypeResult mimeTypeResult) {
-                        synchronized (mCallMethodInfos) {
-                            CallMethodInfo cmi = getCallMethodIfExists(cn);
-                            if (cmi != null) {
-                                cmi.mVideoCallableMimeType = mimeTypeResult.mimeType;
-                                mCallMethodInfos.put(cn, cmi);
-                                maybeBroadcastToSubscribers();
-                            }
+                    public void onResult(Result result) {
+                        if (DEBUG) {
+                            Log.v(TAG, "Event sent with result: " + result.getStatus()
+                                    .getStatusMessage());
                         }
                     }
                 });
+    }
+
+    /**
+     * Get the call method mime type
+     * @param cn
+     * @param apiCallbacks keeps track of the target callback before broadcast
+     */
+    protected static void getCallMethodMimeType(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getCallableMimeType(getInstance().mClient,
+                cn);
+        ResultCallback callback = new ResultCallback<MimeTypeResult>() {
+                @Override
+                public void onResult(MimeTypeResult mimeTypeResult) {
+                    synchronized (mCallMethodInfos) {
+                        CallMethodInfo cmi = getCallMethodIfExists(cn);
+                        if (cmi != null) {
+                            cmi.mMimeType = mimeTypeResult.mimeType;
+                            mCallMethodInfos.put(cn, cmi);
+                            maybeBroadcastToSubscribers(this, apiCallbacks);
+                        }
+                    }
+                }
+            };
+        apiCallbacks.put(callback, result);
+    }
+
+    /**
+     * Get the call method mime type
+     * @param cn
+     * @param apiCallbacks keeps track of the target callback before broadcast
+     */
+    protected static void getCallMethodVideoCallableMimeType(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getVideoCallableMimeType(getInstance()
+                .mClient, cn);
+        ResultCallback callback = new ResultCallback<MimeTypeResult>() {
+                @Override
+                public void onResult(MimeTypeResult mimeTypeResult) {
+                    synchronized (mCallMethodInfos) {
+                        CallMethodInfo cmi = getCallMethodIfExists(cn);
+                        if (cmi != null) {
+                            cmi.mVideoCallableMimeType = mimeTypeResult.mimeType;
+                            mCallMethodInfos.put(cn, cmi);
+                            maybeBroadcastToSubscribers(this, apiCallbacks);
+                        }
+                    }
+                }
+            };
+        apiCallbacks.put(callback, result);
     }
 
     /**
      * Get the IM mime type
      * @param cn
+     * @param apiCallbacks keeps track of the target callbacks before broadcast
      */
-    protected static void getCallMethodImMimeType(final ComponentName cn) {
-        getInstance().mInCallApi.getImMimeType(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<MimeTypeResult>() {
-                    @Override
-                    public void onResult(MimeTypeResult mimeTypeResult) {
-                        synchronized (mCallMethodInfos) {
-                            CallMethodInfo cmi = getCallMethodIfExists(cn);
-                            if (cmi != null) {
-                                cmi.mImMimeType = mimeTypeResult.mimeType;
-                                mCallMethodInfos.put(cn, cmi);
-                                maybeBroadcastToSubscribers();
-                            }
+    protected static void getCallMethodImMimeType(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getImMimeType(getInstance().mClient, cn);
+        ResultCallback callback = new ResultCallback<MimeTypeResult>() {
+                @Override
+                public void onResult(MimeTypeResult mimeTypeResult) {
+                    synchronized (mCallMethodInfos) {
+                        CallMethodInfo cmi = getCallMethodIfExists(cn);
+                        if (cmi != null) {
+                            cmi.mImMimeType = mimeTypeResult.mimeType;
+                            mCallMethodInfos.put(cn, cmi);
+                            maybeBroadcastToSubscribers(this, apiCallbacks);
                         }
                     }
-                });
+                }
+            };
+        apiCallbacks.put(callback, result);
     }
 
     /**
      * Get the Authentication state of the callmethod
      * @param cn
+     * @param apiCallbacks keeps track of the target callbacks before broadcast
      */
-    protected static void getCallMethodAuthenticated(final ComponentName cn,
-            final boolean broadcastASAP) {
-        getInstance().mInCallApi.getAuthenticationState(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<AuthenticationStateResult>() {
+    protected static void getCallMethodAuthenticated(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getAuthenticationState(getInstance()
+                .mClient, cn);
+        ResultCallback callback = new ResultCallback<AuthenticationStateResult>() {
             @Override
             public void onResult(AuthenticationStateResult result) {
                 synchronized (mCallMethodInfos) {
@@ -800,24 +832,51 @@ public class CallMethodHelper {
                         cmi.mIsAuthenticated = result.result == StatusCodes.AuthenticationState
                                 .LOGGED_IN;
                         mCallMethodInfos.put(cn, cmi);
-                        if (broadcastASAP) {
-                            broadcast(true);
-                        } else {
-                            maybeBroadcastToSubscribers();
-                        }
+                        maybeBroadcastToSubscribers(this, apiCallbacks);
                     }
                 }
             }
-        });
+        };
+        apiCallbacks.put(callback, result);
+    }
+
+    /**
+     * Get the logged in account handle of the callmethod
+     * @param cn
+     * @param apiCallbacks keeps track of the target callbacks before broadcast
+     */
+    protected static void getCallMethodAccountHandle(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getAccountHandle(getInstance().mClient, cn);
+        ResultCallback callback = new ResultCallback<AccountHandleResult>() {
+                    @Override
+                    public void onResult(AccountHandleResult result) {
+                        synchronized (mCallMethodInfos) {
+                            CallMethodInfo cmi = getCallMethodIfExists(cn);
+                            if (cmi != null) {
+                                cmi.mAccountHandle = result.accountHandle;
+                                if (TextUtils.isEmpty(cmi.mAccountHandle)) {
+                                    cmi.mAccountHandle = lookupAccountHandle(cn, cmi.mAccountType);
+                                }
+                                mCallMethodInfos.put(cn, cmi);
+                                maybeBroadcastToSubscribers(this, apiCallbacks);
+                            }
+                        }
+                    }
+                };
+        apiCallbacks.put(callback, result);
     }
 
     /**
      * Get the settings intent for the callmethod
      * @param cn
+     * @param apiCallbacks keeps track of the target callback counts before broadcast
      */
-    private static void getSettingsIntent(final ComponentName cn) {
-        getInstance().mInCallApi.getSettingsIntent(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<PendingIntentResult>() {
+    private static void getSettingsIntent(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getSettingsIntent(getInstance().mClient,
+                cn);
+        ResultCallback callback = new ResultCallback<PendingIntentResult>() {
                     @Override
                     public void onResult(PendingIntentResult pendingIntentResult) {
                         synchronized (mCallMethodInfos) {
@@ -825,16 +884,18 @@ public class CallMethodHelper {
                             if (cmi != null) {
                                 cmi.mSettingsIntent = pendingIntentResult.intent;
                                 mCallMethodInfos.put(cn, cmi);
-                                maybeBroadcastToSubscribers();
+                                maybeBroadcastToSubscribers(this, apiCallbacks);
                             }
                         }
                     }
-                });
+                };
+        apiCallbacks.put(callback, result);
     }
 
-    private static void getCreditInfo(final ComponentName cn, final boolean broadcastASAP) {
-        getInstance().mInCallApi.getCreditInfo(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<GetCreditInfoResultResult>() {
+    private static void getCreditInfo(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getCreditInfo(getInstance().mClient, cn);
+        ResultCallback callback = new ResultCallback<GetCreditInfoResultResult>() {
                     @Override
                     public void onResult(GetCreditInfoResultResult getCreditInfoResultResult) {
                         CallMethodInfo cmi = getCallMethodIfExists(cn);
@@ -848,32 +909,33 @@ public class CallMethodHelper {
                                 cmi.mProviderCreditInfo = gcir.creditInfo;
                             }
                             mCallMethodInfos.put(cn, cmi);
-                            if (broadcastASAP) {
-                                broadcast(true);
-                            } else {
-                                maybeBroadcastToSubscribers();
-                            }
+                            maybeBroadcastToSubscribers(this, apiCallbacks);
                         }
                     }
-                });
+                };
+        apiCallbacks.put(callback, result);
     }
 
-    private static void getManageCreditsIntent(final ComponentName cn) {
-        getInstance().mInCallApi.getManageCreditsIntent(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<PendingIntentResult>() {
+    private static void getManageCreditsIntent(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getManageCreditsIntent(getInstance()
+                .mClient, cn);
+        ResultCallback callback = new ResultCallback<PendingIntentResult>() {
                     @Override
                     public void onResult(PendingIntentResult pendingIntentResult) {
                         CallMethodInfo cmi = getCallMethodIfExists(cn);
                         if (cmi != null) {
                             cmi.mManageCreditIntent = pendingIntentResult.intent;
                             mCallMethodInfos.put(cn, cmi);
-                            maybeBroadcastToSubscribers();
+                            maybeBroadcastToSubscribers(this, apiCallbacks);
                         }
                     }
-                });
+                };
+        apiCallbacks.put(callback, result);
     }
 
-    private static void checkLowCreditConfig(final ComponentName cn) {
+    private static void checkLowCreditConfig(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
         // find a nudge component if it exists for this package
         Intent nudgeIntent = new Intent("cyanogen.service.NUDGE_PROVIDER");
         nudgeIntent.setPackage(cn.getPackageName());
@@ -883,18 +945,20 @@ public class CallMethodHelper {
             ResolveInfo result = resolved.get(0);
             ComponentName nudgeComponent = new ComponentName(result.serviceInfo.applicationInfo
                     .packageName, result.serviceInfo.name);
-            collectLowCreditConfig(cn, nudgeComponent);
+            collectLowCreditConfig(cn, nudgeComponent, apiCallbacks);
             return;
         }
 
         // if a nudge component doesn't exist, just finish here
-        maybeBroadcastToSubscribers();
+        maybeBroadcastToSubscribers(null, apiCallbacks);
     }
 
     private static void collectLowCreditConfig(final ComponentName pluginComponent, final
-                                               ComponentName nudgeComponent) {
-        NudgeServices.NudgeApi.getConfigurationForKey(getInstance().mClient, nudgeComponent,
-                NudgeKey.INCALL_CREDIT_NUDGE).setResultCallback(new ResultCallback<BundleResult>() {
+            ComponentName nudgeComponent, final HashMap<ResultCallback, PendingResult>
+            apiCallbacks) {
+        PendingResult result = NudgeServices.NudgeApi.getConfigurationForKey(getInstance().mClient,
+                nudgeComponent, NudgeKey.INCALL_CREDIT_NUDGE);
+        ResultCallback callback = new ResultCallback<BundleResult>() {
             @Override
             public void onResult(BundleResult bundleResult) {
                 CallMethodInfo cmi = getCallMethodIfExists(pluginComponent);
@@ -913,15 +977,17 @@ public class CallMethodHelper {
                         }
                         mCallMethodInfos.put(pluginComponent, cmi);
                     }
-                    maybeBroadcastToSubscribers();
+                    maybeBroadcastToSubscribers(this, apiCallbacks);
                 }
             }
-        });
+        };
+        apiCallbacks.put(callback, result);
     }
 
-    protected static void getLoginIntent(final ComponentName cn) {
-        getInstance().mInCallApi.getLoginIntent(getInstance().mClient, cn)
-                .setResultCallback(new ResultCallback<PendingIntentResult>() {
+    protected static void getLoginIntent(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getLoginIntent(getInstance().mClient, cn);
+        ResultCallback callback = new ResultCallback<PendingIntentResult>() {
                     @Override
                     public void onResult(PendingIntentResult pendingIntentResult) {
                         synchronized (mCallMethodInfos) {
@@ -929,36 +995,42 @@ public class CallMethodHelper {
                             if (cmi != null) {
                                 cmi.mLoginIntent = pendingIntentResult.intent;
                                 mCallMethodInfos.put(cn, cmi);
-                                maybeBroadcastToSubscribers();
+                                maybeBroadcastToSubscribers(this, apiCallbacks);
                             }
                         }
                     }
-                });
+                };
+        apiCallbacks.put(callback, result);
     }
 
     /**
      * Get the the contact directory search intent with a callback
      * @param cn
+     * @param apiCallbacks keeps track of the target callbacks before broadcast
      */
-    protected static void getDefaultDirectorySearchIntent(final ComponentName cn) {
-        getInstance().mInCallApi.getDirectorySearchIntent(getInstance().mClient, cn, Uri.parse(""))
-                .setResultCallback(new ResultCallback<PendingIntentResult>() {
+    protected static void getDefaultDirectorySearchIntent(final ComponentName cn, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getDirectorySearchIntent(getInstance()
+                .mClient, cn, Uri.parse(""));
+        ResultCallback callback = new ResultCallback<PendingIntentResult>() {
                     @Override
                     public void onResult(PendingIntentResult pendingIntentResult) {
                         synchronized (mCallMethodInfos) {
                             CallMethodInfo cmi = getCallMethodIfExists(cn);
                             if (cmi != null) {
                                 cmi.mDefaultDirectorySearchIntent = pendingIntentResult.intent;
-                                maybeBroadcastToSubscribers();
+                                maybeBroadcastToSubscribers(this, apiCallbacks);
                             }
                         }
                     }
-                });
+                };
+        apiCallbacks.put(callback, result);
     }
 
     /**
-     * Get the the invite intent
+     * Get the the invite intent with a callback
      * @param cn
+     * @param contactInfo contact info contains display name, phone, and contact Uri for lookup
      */
     protected static void getInviteIntent(final ComponentName cn, InCallContactInfo contactInfo) {
         getInstance().mInCallApi.getInviteIntent(getInstance().mClient, cn,
@@ -976,9 +1048,9 @@ public class CallMethodHelper {
     }
 
     /**
-     * Get the the contact directory search intent with a callback
+     * Get the the contact directory search intent with a blocking call
      * @param cn
-     * @param contactInfo contact info containing display name, phone number and contact Uri
+     * @param contactInfo contact info contains display name, phone and contact Uri for lookup
      */
 
     public static PendingIntent getInviteIntentSync(final ComponentName cn, InCallContactInfo
@@ -999,7 +1071,6 @@ public class CallMethodHelper {
      * @param contactUri contact lookup Uri
      */
     protected static void getDirectorySearchIntent(final ComponentName cn, Uri contactUri) {
-        //InCallContactInfo contactInfo = new InCallContactInfo(null, null, Uri.parse(""));
         getInstance().mInCallApi.getDirectorySearchIntent(getInstance().mClient, cn, contactUri)
                 .setResultCallback(new ResultCallback<PendingIntentResult>() {
                     @Override
@@ -1047,10 +1118,11 @@ public class CallMethodHelper {
         return null;
     }
 
-    protected static void getNudgeConfiguration(final ComponentName cn, final String key) {
+    protected static void getNudgeConfiguration(final ComponentName cn, final String key, final
+            HashMap<ResultCallback, PendingResult> apiCallbacks) {
         final ComponentName nudgeComponent;
 
-        com.android.phone.common.incall.CallMethodInfo cm = null;
+        CallMethodInfo cm = null;
         synchronized (mCallMethodInfos) {
             cm = getCallMethodIfExists(cn);
         }
@@ -1064,12 +1136,13 @@ public class CallMethodHelper {
         } else {
             nudgeComponent = cm.mNudgeComponent;
         }
-        NudgeServices.NudgeApi.getConfigurationForKey(getInstance().mClient,
-                nudgeComponent, key).setResultCallback(new ResultCallback<BundleResult>() {
+        PendingResult result = NudgeServices.NudgeApi.getConfigurationForKey(getInstance()
+                .mClient, nudgeComponent, key);
+        ResultCallback callback = new ResultCallback<BundleResult>() {
             @Override
             public void onResult(BundleResult bundleResult) {
                 synchronized (mCallMethodInfos) {
-                    com.android.phone.common.incall.CallMethodInfo cmi = getCallMethodIfExists(cn);
+                    CallMethodInfo cmi = getCallMethodIfExists(cn);
                     if (bundleResult != null && bundleResult.bundle != null) {
                         Bundle nudgeConfig = bundleResult.bundle;
                         switch (key) {
@@ -1113,10 +1186,11 @@ public class CallMethodHelper {
                         }
                     }
 
-                    maybeBroadcastToSubscribers();
+                    maybeBroadcastToSubscribers(this, apiCallbacks);
                 }
             }
-        });
+        };
+        apiCallbacks.put(callback, result);
     }
 
     public static Set<String> getAllEnabledVoiceMimeSet() {
