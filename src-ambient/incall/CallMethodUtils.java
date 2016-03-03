@@ -23,6 +23,7 @@ public class CallMethodUtils {
     public final static String PREF_SPINNER_COACHMARK_SHOW = "pref_spinner_coachmark_shown";
     public final static String PREF_LAST_ENABLED_PROVIDER = "pref_last_enabled_provider";
     public final static String PREF_INTERNATIONAL_CALLS = "pref_international_calls";
+    public final static String PREF_WIFI_CALL = "pref_wifi_call";
 
     public static CallMethodInfo getDefaultSimInfo(Context context) {
         final TelecomManager telecomMgr =
