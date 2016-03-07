@@ -74,7 +74,7 @@ public class CreditBarHelper {
         } else {
             if (cmi.mIsAuthenticated) {
                 button = cmi.mManageCreditIntent;
-                if (cmi.usesSubscriptions()) {
+                if (cmi.showSubscriptions()) {
                     buttonText = cmi.mSubscriptionButtonText;
                 } else {
                     if (cmi.getCurrencyAmount() <= cmi.mCreditWarn) {

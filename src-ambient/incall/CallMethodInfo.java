@@ -322,9 +322,17 @@ public class CallMethodInfo {
         }
     }
 
-    public boolean usesSubscriptions() {
+    public boolean showSubscriptions() {
+        // If the user has > 0 credits, we don't want to show the subscription.
         List<SubscriptionInfo> subscriptionInfos = this.mProviderCreditInfo.subscriptions;
-        return subscriptionInfos != null && !subscriptionInfos.isEmpty();
+        CreditBalance creditBalance =  this.mProviderCreditInfo.balance;
+
+        boolean hasSubscriptions = subscriptionInfos != null && !subscriptionInfos.isEmpty();
+
+        boolean hasCredits = creditBalance != null && creditBalance.currencyCode != null
+                && creditBalance.balance > 0;
+
+        return !hasCredits && hasSubscriptions;
     }
 
     public int getCurrencyAmount() {
