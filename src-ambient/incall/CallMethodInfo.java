@@ -58,11 +58,37 @@ public class CallMethodInfo {
     public String mCreditButtonText;
     public String mT9HintDescription;
     public PendingIntent mSettingsIntent;
+    /* Plugin's simple brand icon (24dp x 24dp)
+       Expected format: Vector Drawable (.xml)
+       2 colors allowed. */
     public Drawable mBrandIcon;
+    /* Plugin's single color simple brand icon (24dp x 24dp)
+       Same as to pluginBrandIcon, but only a single color.
+       Please keep image single color, it will be tinted in the client application.
+       Expected format: Vector Drawable (.xml)
+       1 color allowed. */
     public Drawable mSingleColorBrandIcon;
+    /* Plugin's attribution badge (17dp x 17dp)
+       Similar to pluginBrandIcon.
+       To make badge pop against (on top of) images, please add a white outline.
+       Expected format: Vector Drawable (.xml)
+       2 colors allowed. */
     public Drawable mBadgeIcon;
+    /* Plugin's full brand icon (any width (max 360dp) x 60dp height)
+       May contain full brand name or icon image.
+       Please keep image single color, it will be tinted in the client application.
+       Expected format: Vector Drawable (.xml)
+       1 color allowed. */
     public Drawable mLoginIcon;
+    /* Plugin's first action icon (24dp x 24dp)
+       This icon is used in conjunction with pluginActionOneTitle.
+       Expected format: Vector Drawable (.xml)
+       2 colors allowed. */
     public Drawable mActionOneIcon;
+    /* Plugin's second action icon (24dp x 24dp)
+       This icon is used in conjunction with pluginActionTwoTitle.
+       Expected format: Vector Drawable (.xml)
+       2 colors allowed. */
     public Drawable mActionTwoIcon;
     public Resources pluginResources;
     public String mActionOneText;
@@ -94,8 +120,17 @@ public class CallMethodInfo {
     public String mInstallNudgeSubtitle;
     public String mInstallNudgeActionText;
     public String mDependentPackage;
+    /* Plugin's IM action icon (24dp x 24dp)
+       Expected format: Vector Drawable (.xml)
+       1 color allowed. */
     public Drawable mImIcon;
+    /* Plugin's video call action icon (24dp x 24dp)
+       Expected format: Vector Drawable (.xml)
+       1 color allowed. */
     public Drawable mVideoIcon;
+    /* Plugin's voice call action icon (24dp x 24dp)
+       Expected format: Vector Drawable (.xml)
+       1 color allowed. */
     public Drawable mVoiceIcon;
     private static CallMethodInfo sEmergencyCallMethod;
 
