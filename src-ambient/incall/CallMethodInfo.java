@@ -23,7 +23,10 @@ import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.UserHandle;
 import android.provider.ContactsContract;
+import android.telecom.PhoneAccountHandle;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.SubscriptionManager;
+import android.text.TextUtils;
 import android.util.Log;
 import com.android.phone.common.ambient.AmbientConnection;
 import com.android.phone.common.R;
@@ -211,8 +214,7 @@ public class CallMethodInfo {
     /**
      * return empty mock call method that represents emergency call only mode
      */
-    public static CallMethodInfo getEmergencyCallMethod(Context context) {
-        Context ctx = context.getApplicationContext();
+    public static CallMethodInfo getEmergencyCallMethod(Context ctx) {
         if (sEmergencyCallMethod == null) {
             sEmergencyCallMethod = new CallMethodInfo();
             sEmergencyCallMethod.mName =
@@ -225,6 +227,25 @@ public class CallMethodInfo {
         }
 
         return sEmergencyCallMethod;
+    }
+
+    public static PhoneAccountHandle getPhoneAccountHandleFromCallMethodInfo(Context ctx,
+            CallMethodInfo callMethodInfo, String number) {
+        CallMethodInfo emergencyCallMethod = getEmergencyCallMethod(ctx);
+        // If no sim is selected, or emergency callmethod selected, or number is
+        // an emergency number, phone account handle should be null, and will use the
+        // default account.
+        // Else, create PhoneAccountHandle from selected callmethod components and
+        // initial call using that account.
+        PhoneAccountHandle handle = null;
+        if (callMethodInfo != null && !callMethodInfo.mIsInCallProvider &&
+                !callMethodInfo.equals(emergencyCallMethod) &&
+                (number == null || !PhoneNumberUtils.isEmergencyNumber(number))) {
+            handle = new PhoneAccountHandle(callMethodInfo.mComponent,
+                    callMethodInfo.mId,
+                    callMethodInfo.mUserHandle);
+        }
+        return handle;
     }
 
     public void placeCall(String origin, String number, Context c) {
