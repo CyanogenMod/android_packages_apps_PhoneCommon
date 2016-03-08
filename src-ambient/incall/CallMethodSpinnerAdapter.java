@@ -155,8 +155,8 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
 
     private void setIcon(View convertView, CallMethodInfo callMethodInfo) {
         ImageView icon = (ImageView) convertView.findViewById(R.id.call_method_spinner_item_image);
-        if (callMethodInfo.mBadgeIcon != null) {
-            icon.setImageDrawable(callMethodInfo.mBadgeIcon);
+        if (callMethodInfo.mBrandIcon != null) {
+            icon.setImageDrawable(callMethodInfo.mBrandIcon);
             icon.getDrawable().setTintList(null);
             icon.setBackground(null);
         } else {
