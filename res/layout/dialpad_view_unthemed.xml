@@ -107,18 +107,12 @@
             android:gravity="center"
             android:visibility="invisible" />
 
-        <Spinner
-            android:id="@+id/call_method_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:dropDownWidth="wrap_content"
-            android:background="@drawable/btn_dialpad_key"
-            android:gravity="center_vertical"
-            android:paddingStart="@dimen/call_method_spinner_padding_start"
-            android:paddingEnd="@dimen/dialpad_digits_padding"  />
+        <!-- Sim card selection and VoLTE annunciator. -->
+        <include layout="@layout/dialer_volte_label" />
+        <include layout="@layout/call_method_multiple_providers" />
 
         <view class="com.android.phone.common.dialpad.DigitsEditText"
-            xmlns:ex="http://schemas.android.com/apk/res-auto"
+            xmlns:ex="http://schemas.android.com/apk/res-autos"
             android:id="@+id/digits"
             android:layout_width="0dp"
             android:layout_height="match_parent"

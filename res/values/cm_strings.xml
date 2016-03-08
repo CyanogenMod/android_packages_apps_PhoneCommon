@@ -30,4 +30,7 @@
 
      <!-- InCall Sign in button -->
     <string name="sign_in_credit_banner_text">SIGN IN</string>
+
+    <string name="call_method_spinner_volte_drop_down_tag">Spinner Volte Drop Down Tag</string>
+    <string name="call_method_spinner_drop_down_tag">Spinner Drop Down Tag</string>
 </resources>

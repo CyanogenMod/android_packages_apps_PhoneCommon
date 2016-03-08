@@ -30,6 +30,7 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.android.phone.common.R;
+import com.android.phone.common.util.VolteUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,11 +46,14 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
 
     private final Context mContext;
     private Map<String, Integer> mComponentMap;
+    private boolean mShowVolte = false;
 
-    public CallMethodSpinnerAdapter(Context context, List<CallMethodInfo> objects) {
+    public CallMethodSpinnerAdapter(Context context, List<CallMethodInfo> objects, boolean
+            showVolte) {
         super(context, 0, objects);
         mContext = context.getApplicationContext();
         processCallMethods(objects);
+        mShowVolte = showVolte;
     }
 
     /**
@@ -114,11 +118,29 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         CallMethodInfo callMethodInfo = getItem(position);
-        if (convertView == null) {
-            convertView = LayoutInflater.from(mContext)
-                    .inflate(R.layout.call_method_spinner_item, parent, false);
-        }
+        boolean volteInUse = (callMethodInfo.mSubId > 0) &&
+                VolteUtils.isVolteInUse(mContext, callMethodInfo.mSubId);
 
+        SpinnerItemViewHolder holder = null;
+        // Note: if mVolteInUse changes, it invalidates cached views
+        if (convertView == null || (holder = (SpinnerItemViewHolder)convertView.getTag()) == null
+                || holder.volteInUse != volteInUse)
+        {
+            convertView = LayoutInflater.from(mContext).inflate(R.layout
+                    .call_method_spinner_item, parent, false);
+            if (holder == null) holder = new SpinnerItemViewHolder();
+            convertView.setTag(holder);
+            holder.volteInUse = volteInUse;
+            holder.callTypeIcon = (ImageView) convertView.findViewById(R.id
+                    .call_method_spinner_item_image);
+            holder.volteIcon = (ImageView) convertView.findViewById(R.id
+                    .call_method_spinner_volte_image);
+        }
+        if (mShowVolte && volteInUse) {
+            holder.volteIcon.setVisibility(View.VISIBLE);
+        } else {
+            holder.volteIcon.setVisibility(View.GONE);
+        }
         setIcon(convertView, callMethodInfo);
 
         return convertView;
@@ -140,15 +162,33 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         CallMethodInfo callMethodInfo = getItem(position);
-        if (convertView == null) {
-            convertView = LayoutInflater.from(mContext)
-                    .inflate(R.layout.call_method_spinner_dropdown_item, parent, false);
+        boolean volteInUse = (callMethodInfo.mSubId > 0) &&
+                VolteUtils.isVolteInUse(mContext, callMethodInfo.mSubId);
+
+        SpinnerDropDownItemViewHolder holder = null;
+        int tag = volteInUse ? R.string.call_method_spinner_volte_drop_down_tag :
+                R.string.call_method_spinner_drop_down_tag;
+        if (convertView == null || (holder = (SpinnerDropDownItemViewHolder) convertView.getTag
+                (tag)) == null) {
+            int resId = R.layout.call_method_spinner_dropdown_item;
+            convertView = LayoutInflater.from(mContext).inflate(resId, parent, false);
+            holder = new SpinnerDropDownItemViewHolder();
+            holder.volteInUse = volteInUse;
+            holder.callTypeIcon = (ImageView) convertView.findViewById(R.id
+                    .call_method_spinner_item_image);
+            holder.volteIcon = (ImageView) convertView.findViewById(R.id
+                    .call_method_spinner_volte_image);
+            holder.textView = (TextView) convertView.findViewById(R.id
+                    .call_method_spinner_item_text);
+            convertView.setTag(tag, holder);
         }
-
+        if (mShowVolte && volteInUse) {
+            holder.volteIcon.setVisibility(View.VISIBLE);
+        } else {
+            holder.volteIcon.setVisibility(View.GONE);
+        }
         setIcon(convertView, callMethodInfo);
-
-        TextView text=(TextView) convertView.findViewById(R.id.call_method_spinner_item_text);
-        text.setText(callMethodInfo.mName);
+        holder.textView.setText(callMethodInfo.mName);
 
         return convertView;
     }
@@ -246,5 +286,18 @@ public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
             return null;
         }
         return String.valueOf(info.hashCode());
+    }
+
+    private static class SpinnerItemViewHolder {
+        ImageView callTypeIcon;
+        ImageView volteIcon;
+        boolean volteInUse;
+    }
+
+    private static class SpinnerDropDownItemViewHolder {
+        ImageView callTypeIcon;
+        ImageView volteIcon;
+        TextView textView;
+        boolean volteInUse;
     }
 }

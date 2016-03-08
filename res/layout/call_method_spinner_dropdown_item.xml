@@ -16,16 +16,32 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:layout_width="match_parent"
+    android:layout_width="@dimen/call_method_spinner_dropdown_item_width"
     android:layout_height="@dimen/dialpad_digits_height"
     android:paddingStart="@dimen/call_method_spinner_item_default_padding"
     android:paddingEnd="@dimen/call_method_spinner_item_default_padding">
 
-    <ImageView
-        android:id="@+id/call_method_spinner_item_image"
-        android:layout_width="@dimen/call_method_spinner_icon_size"
-        android:layout_height="@dimen/call_method_spinner_icon_size"
-        android:layout_gravity="center_vertical" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/call_method_spinner_item_image"
+            android:layout_width="@dimen/call_method_spinner_icon_size"
+            android:layout_height="@dimen/call_method_spinner_icon_size"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- VoLTE annunciator. Carriers may customize this annunciator
+         by overlaying the ic_volte.xml drawable. -->
+        <ImageView
+            android:id="@+id/call_method_spinner_volte_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_volte"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/call_method_spinner_item_text"

@@ -71,6 +71,7 @@ public class DialpadView extends LinearLayout {
     private View mOverflowMenuButton;
     private ColorStateList mRippleColor;
     private Spinner mCallMethodSpinner;
+    private View mVolteLabel;
 
     private ViewGroup mRateContainer;
     private TextView mIldCountry;
@@ -121,6 +122,7 @@ public class DialpadView extends LinearLayout {
         mIldCountry = (TextView) mRateContainer.findViewById(R.id.ild_country);
         mIldRate = (TextView) mRateContainer.findViewById(R.id.ild_rate);
         mCallMethodSpinner = (Spinner) findViewById(R.id.call_method_spinner);
+        mVolteLabel = findViewById(R.id.call_method_volte_single_provider);
 
         AccessibilityManager accessibilityManager = (AccessibilityManager)
                 getContext().getSystemService(Context.ACCESSIBILITY_SERVICE);
@@ -332,6 +334,8 @@ public class DialpadView extends LinearLayout {
     }
 
     public Spinner getCallMethodSpinner() { return mCallMethodSpinner; }
+
+    public View getVolteLabel() { return mVolteLabel; }
 
     public View getOverflowMenuButton() {
         return mOverflowMenuButton;
