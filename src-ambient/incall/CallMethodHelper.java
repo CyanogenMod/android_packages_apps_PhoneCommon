@@ -674,6 +674,7 @@ public class CallMethodHelper {
                             cmi.mComponent = cn;
                             cmi.mNudgeComponent = icpi.getNudgeComponent() == null ? null :
                                     ComponentName.unflattenFromString(icpi.getNudgeComponent());
+                            cmi.mDependentPackage = icpi.getDependentPackage();
                             cmi.mName = icpi.getTitle();
                             cmi.mSummary = icpi.getSummary();
                             cmi.mAccountType = icpi.getAccountType();
