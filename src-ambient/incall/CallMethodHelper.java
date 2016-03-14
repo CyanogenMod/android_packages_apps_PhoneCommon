@@ -536,8 +536,9 @@ public class CallMethodHelper {
 
                 mCallMethodInfos.clear();
 
-                if (mInstalledPlugins.size() == 0) {
+                if (mInstalledPlugins == null || mInstalledPlugins.size() == 0) {
                     broadcast();
+                    return;
                 }
 
                 for (ComponentName cn : mInstalledPlugins) {
