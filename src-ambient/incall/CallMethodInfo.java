@@ -60,7 +60,8 @@ public class CallMethodInfo {
     public String mImMimeType;
     public String mSubscriptionButtonText;
     public String mCreditButtonText;
-    public String mT9HintDescription;
+    public String mT9HintDescriptionNoCreditOrSub;
+    public String mT9HintDescriptionHasCreditOrSub;
     public PendingIntent mSettingsIntent;
     /* Plugin's simple brand icon (24dp x 24dp)
        Expected format: Vector Drawable (.xml)
@@ -283,20 +284,70 @@ public class CallMethodInfo {
         }
     }
 
+    public boolean hasAvailableCredit() {
+        boolean hasAvailableCredit = false;
+        CreditInfo ci =  this.mProviderCreditInfo;
+        if (ci != null) {
+            CreditBalance balance = ci.balance;
+            if (balance != null) {
+                mCurrencyAmount = (int) balance.balance;
+                hasAvailableCredit = mCurrencyAmount > 0;
+            }
+        }
+        return hasAvailableCredit;
+    }
+
+    public boolean hasSubscription() {
+        boolean hasSubscription = false;
+        CreditInfo ci =  this.mProviderCreditInfo;
+        if (ci != null) {
+            List<SubscriptionInfo> subscriptionInfos = ci.subscriptions;
+            hasSubscription = subscriptionInfos != null && !subscriptionInfos.isEmpty();
+        }
+        return hasSubscription;
+    }
+
     public boolean showSubscriptions() {
         // If the user has > 0 credits, we don't want to show the subscription.
-        List<SubscriptionInfo> subscriptionInfos = this.mProviderCreditInfo.subscriptions;
-        CreditBalance creditBalance =  this.mProviderCreditInfo.balance;
-
-        boolean hasSubscriptions = subscriptionInfos != null && !subscriptionInfos.isEmpty();
-
-        boolean hasCredits = creditBalance != null && creditBalance.currencyCode != null
-                && creditBalance.balance > 0;
+        boolean hasCredits = hasAvailableCredit();
+        boolean hasSubscriptions = hasSubscription();
 
         return !hasCredits && hasSubscriptions;
     }
 
     public int getCurrencyAmount() {
         return mCurrencyAmount;
+    }
+
+    /**
+     * Returns hint text based on credit and subscription availability.
+     * If either is null or empty, use the non-null/non-empty string.
+     * Null is returned if both are null or empty.
+     * @return hintText String hint text for the current situation
+     */
+    public String getHintText() {
+        String hintText = null;
+        boolean hasAvailableCredit = hasAvailableCredit();
+        boolean usesSubscriptions = hasSubscription();
+        if (!hasAvailableCredit && !usesSubscriptions) {
+            // No credits and no subscription
+            if (!TextUtils.isEmpty(mT9HintDescriptionNoCreditOrSub)) {
+                // Use no credits or subscription hint
+                hintText = mT9HintDescriptionNoCreditOrSub;
+            } else if (!TextUtils.isEmpty(mT9HintDescriptionHasCreditOrSub)) {
+                // If no credit/sub hint empty, but has credit/sub hint valid, use it
+                hintText = mT9HintDescriptionHasCreditOrSub;
+            }
+        } else {
+            // Has credits or subscription
+            if (!TextUtils.isEmpty(mT9HintDescriptionHasCreditOrSub)) {
+                // Use has credits/sub hint text
+                hintText = mT9HintDescriptionHasCreditOrSub;
+            } else if (!TextUtils.isEmpty(mT9HintDescriptionNoCreditOrSub)) {
+                // If has credit/sub hint empty, but no credit/sub hint valid, use it
+                hintText = mT9HintDescriptionNoCreditOrSub;
+            }
+        }
+        return hintText;
     }
 }

@@ -37,6 +37,7 @@ import com.android.phone.common.ambient.AmbientConnection;
 import com.android.phone.common.util.StartInCallCallReceiver;
 import com.cyanogen.ambient.analytics.Event;
 import com.cyanogen.ambient.common.api.AmbientApiClient;
+import com.cyanogen.ambient.common.api.CommonStatusCodes;
 import com.cyanogen.ambient.common.api.PendingResult;
 import com.cyanogen.ambient.common.api.Result;
 import com.cyanogen.ambient.common.api.ResultCallback;
@@ -48,6 +49,7 @@ import com.cyanogen.ambient.incall.InCallServices;
 import com.cyanogen.ambient.incall.extension.CreditBalance;
 import com.cyanogen.ambient.incall.extension.CreditInfo;
 import com.cyanogen.ambient.incall.extension.GetCreditInfoResult;
+import com.cyanogen.ambient.incall.extension.HintTextResult;
 import com.cyanogen.ambient.incall.extension.IAuthenticationListener;
 import com.cyanogen.ambient.incall.extension.ICallCreditListener;
 import com.cyanogen.ambient.incall.extension.InCallContactInfo;
@@ -55,6 +57,7 @@ import com.cyanogen.ambient.incall.extension.StatusCodes;
 import com.cyanogen.ambient.incall.results.AccountHandleResult;
 import com.cyanogen.ambient.incall.results.AuthenticationStateResult;
 import com.cyanogen.ambient.incall.results.GetCreditInfoResultResult;
+import com.cyanogen.ambient.incall.results.HintTextResultResult;
 import com.cyanogen.ambient.incall.results.InCallProviderInfoResult;
 import com.cyanogen.ambient.incall.results.InstalledPluginsResult;
 import com.cyanogen.ambient.incall.results.MimeTypeResult;
@@ -555,6 +558,7 @@ public class CallMethodHelper {
                     getCallMethodAuthenticated(cn, apiCallbacks);
                     getLoginIntent(cn, apiCallbacks);
                     getSettingsIntent(cn, apiCallbacks);
+                    getHintText(cn, apiCallbacks);
                     getCreditInfo(cn, apiCallbacks);
                     getManageCreditsIntent(cn, apiCallbacks);
                     checkLowCreditConfig(cn, apiCallbacks);
@@ -639,7 +643,10 @@ public class CallMethodHelper {
                             cmi.mColor = NO_COLOR;
                             cmi.mSubscriptionButtonText = icpi.getSubscriptionButtonText();
                             cmi.mCreditButtonText = icpi.getCreditsButtonText();
-                            cmi.mT9HintDescription = icpi.getT9HintDescription();
+                            // If present, use the deprecated attribute defined hint text.
+                            // These values may be overwritten by getHintText.
+                            cmi.mT9HintDescriptionNoCreditOrSub = icpi.getT9HintDescription();
+                            cmi.mT9HintDescriptionHasCreditOrSub = icpi.getT9HintDescription();
                             cmi.mActionOneText = icpi.getActionOneTitle();
                             cmi.mActionTwoText = icpi.getActionTwoTitle();
                             cmi.mIsInCallProvider = true;
@@ -873,6 +880,43 @@ public class CallMethodHelper {
                         }
                     }
                 };
+        apiCallbacks.put(callback, result);
+    }
+
+    /**
+     * Get the hint texts for the callmethod
+     * @param cn
+     * @param apiCallbacks keeps track of the target callback counts before broadcast
+     */
+    private static void getHintText(final ComponentName cn,
+            final HashMap<ResultCallback, PendingResult> apiCallbacks) {
+        PendingResult result = getInstance().mInCallApi.getHintText(getInstance().mClient, cn);
+        ResultCallback callback = new ResultCallback<HintTextResultResult>() {
+            @Override
+            public void onResult(HintTextResultResult hintTextResultResult) {
+                if (hintTextResultResult != null) {
+                    HintTextResult result = hintTextResultResult.result;
+                    if (result != null) {
+                        synchronized (mCallMethodInfos) {
+                            CallMethodInfo cmi = getCallMethodIfExists(cn);
+                            if (cmi != null) {
+                                String hintText = result.getNoCreditOrSubscriptionHint();
+                                if (!TextUtils.isEmpty(hintText)) {
+                                    cmi.mT9HintDescriptionNoCreditOrSub = hintText;
+                                }
+
+                                hintText = result.getHasCreditOrSubscriptionHint();
+                                if (!TextUtils.isEmpty(hintText)) {
+                                    cmi.mT9HintDescriptionHasCreditOrSub = hintText;
+                                }
+                                mCallMethodInfos.put(cn, cmi);
+                                maybeBroadcastToSubscribers(this, apiCallbacks);
+                            }
+                        }
+                    }
+                }
+            }
+        };
         apiCallbacks.put(callback, result);
     }
 
