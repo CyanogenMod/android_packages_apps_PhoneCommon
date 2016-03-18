@@ -29,13 +29,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.contacts.common.model.AccountTypeManager;
-import com.android.contacts.common.model.account.AccountType;
-import com.android.contacts.common.model.account.AccountWithDataSet;
 import com.android.phone.common.R;
 import com.android.phone.common.ambient.AmbientConnection;
 import com.android.phone.common.util.StartInCallCallReceiver;
@@ -568,35 +564,6 @@ public class CallMethodHelper {
         }
     }
 
-    /*
-     * Look up the currently logged in plugin account in case plugin fails to return a valid
-     * account handle
-     */
-    private static String lookupAccountHandle(ComponentName cn, String targetAccountType) {
-        // Gather account handles logged into the device as a backup, in case
-        // plugins fail to return the account handle even when it reports its
-        // state as authenticated
-        AccountTypeManager accountTypes = AccountTypeManager.getInstance(getInstance().mContext);
-        List<AccountWithDataSet> accounts = accountTypes.getAccounts(false);
-        ArrayMap<String, String> accountMap = new ArrayMap<String, String>();
-
-        for (AccountWithDataSet account : accounts) {
-            AccountType accountType =
-                    accountTypes.getAccountType(account.type, account.dataSet);
-            if (accountType.isExtension() &&
-                    !account.hasData(getInstance().mContext)) {
-                // Hide extensions with no raw_contacts.
-                continue;
-            }
-            if (DEBUG) {
-                Log.d(TAG, "account.type: " + account.type + "account.name: " + account.name);
-            }
-            // currently only handle one account per account type use case
-            accountMap.put(account.type, account.name);
-        }
-        return accountMap.containsKey(targetAccountType) ? accountMap.get(targetAccountType) : "";
-    }
-
     /**
      * Get the plugin info
      * @param cn
@@ -680,7 +647,8 @@ public class CallMethodHelper {
                             cmi.mAccountType = icpi.getAccountType();
                             cmi.mAccountHandle = icpi.getAccountHandle();
                             if (TextUtils.isEmpty(cmi.mAccountHandle)) {
-                                cmi.mAccountHandle = lookupAccountHandle(cn, cmi.mAccountType);
+                                cmi.mAccountHandle = CallMethodUtils.lookupAccountHandle(
+                                        getInstance().mContext, cmi.mAccountType);
                             }
                             cmi.mBrandIconId = icpi.getBrandIcon();
                             cmi.mLoginIconId = icpi.getLoginIcon();
@@ -858,7 +826,9 @@ public class CallMethodHelper {
                             if (cmi != null) {
                                 cmi.mAccountHandle = result.accountHandle;
                                 if (TextUtils.isEmpty(cmi.mAccountHandle)) {
-                                    cmi.mAccountHandle = lookupAccountHandle(cn, cmi.mAccountType);
+                                    cmi.mAccountHandle =
+                                            CallMethodUtils.lookupAccountHandle(
+                                            getInstance().mContext, cmi.mAccountType);
                                 }
                                 mCallMethodInfos.put(cn, cmi);
                                 maybeBroadcastToSubscribers(this, apiCallbacks);
