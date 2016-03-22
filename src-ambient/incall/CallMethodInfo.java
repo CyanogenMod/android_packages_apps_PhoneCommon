@@ -29,6 +29,7 @@ import android.telephony.SubscriptionManager;
 import android.text.TextUtils;
 import android.util.Log;
 import com.android.phone.common.ambient.AmbientConnection;
+import com.android.phone.common.incall.CallMethodHelper.InCallCallListener;
 import com.android.phone.common.R;
 import com.android.phone.common.util.StartInCallCallReceiver;
 import com.cyanogen.ambient.incall.InCallServices;
@@ -201,17 +202,29 @@ public class CallMethodInfo {
     }
 
     public void placeCall(String origin, String number, Context c, boolean isVideoCall) {
-        placeCall(origin, number, c, isVideoCall, false, null);
+        placeCall(origin, number, c, isVideoCall, false, null, null);
     }
 
     public void placeCall(String origin, String number, Context c, boolean isVideoCall, boolean
             forcePSTN) {
-        placeCall(origin, number, c, isVideoCall, forcePSTN, null);
+        placeCall(origin, number, c, isVideoCall, forcePSTN, null, null);
+    }
+
+    public void placeCall(String origin, String number, Context c, boolean isVideoCall, boolean
+            forcePSTN, InCallCallListener listener) {
+        placeCall(origin, number, c, isVideoCall, forcePSTN, null, listener);
     }
 
     public void placeCall(String origin, String number, Context c, boolean isVideoCall,
                           boolean forcePSTN, String numberMimeType) {
-        StartInCallCallReceiver svcrr = CallMethodHelper.getVoIPResultReceiver(this, origin);
+        placeCall(origin, number, c, isVideoCall, forcePSTN, numberMimeType, null);
+    }
+
+    public void placeCall(String origin, String number, Context c, boolean isVideoCall,
+            boolean forcePSTN, String numberMimeType, InCallCallListener listener) {
+
+        StartInCallCallReceiver svcrr
+                = CallMethodHelper.getVoIPResultReceiver(this, origin, listener);
         StartCallRequest request = new StartCallRequest(number, origin, 0, svcrr);
 
         if (isVideoCall) {

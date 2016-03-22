@@ -83,8 +83,10 @@ import static com.cyanogen.ambient.incall.util.InCallHelper.NO_COLOR;
  */
 public class CallMethodHelper {
 
-    protected static CallMethodHelper sInstance;
+    protected static final String TAG = CallMethodHelper.class.getSimpleName();
+    protected static final boolean DEBUG = false;
 
+    protected static CallMethodHelper sInstance;
     protected AmbientApiClient mClient;
     protected Context mContext;
     protected InCallApi mInCallApi;
@@ -98,8 +100,7 @@ public class CallMethodHelper {
     protected static HashMap<String, CallMethodReceiver> mRegisteredClients = new HashMap<>();
     protected static boolean dataHasBeenBroadcastPreviously = false;
     // determine which info types to load
-    protected static final String TAG = CallMethodHelper.class.getSimpleName();
-    protected static final boolean DEBUG = false;
+
 
     public interface CallMethodReceiver {
         void onChanged(HashMap<ComponentName, CallMethodInfo> callMethodInfos);
@@ -262,13 +263,22 @@ public class CallMethodHelper {
         return sInstance;
     }
 
+    public interface InCallCallListener {
+        void onResult(int resultCode);
+    }
+
     /**
      * Generic CallResultReceiver with basic error handling
      * @param cmi
      * @return
      */
     public static StartInCallCallReceiver getVoIPResultReceiver(final CallMethodInfo cmi,
-                                                                    final String originCode) {
+            final String originCode) {
+        return getVoIPResultReceiver(cmi, originCode, null);
+    }
+
+    public static StartInCallCallReceiver getVoIPResultReceiver(final CallMethodInfo cmi,
+            final String originCode, final InCallCallListener listener) {
         StartInCallCallReceiver svcrr =
                 new StartInCallCallReceiver(new Handler(Looper.getMainLooper()));
 
@@ -284,22 +294,19 @@ public class CallMethodHelper {
                     case StatusCodes.StartCall.CALL_FAILURE_TIMEOUT:
                     case StatusCodes.StartCall.CALL_FAILURE_UNAUTHENTICATED:
                     case StatusCodes.StartCall.CALL_FAILURE:
-
                         String text = getInstance().mContext.getResources()
                                 .getString(R.string.invalid_number_text);
                         text = String.format(text, cmi.mName);
                         Toast.makeText(getInstance().mContext, text, Toast.LENGTH_LONG).show();
-                        break;
-                    case StatusCodes.StartCall.CALL_CONNECTED:
-                        break;
-                    case StatusCodes.StartCall.HANDOVER_CONNECTED:
                         break;
                     default:
                         Log.i(TAG, "Nothing to do for this Start VoIP Call resultcode = "
                                 + resultCode);
                         break;
                 }
-
+                if (listener != null) {
+                    listener.onResult(resultCode);
+                }
             }
 
         });
@@ -696,6 +703,12 @@ public class CallMethodHelper {
         if (DEBUG) {
             Log.d(TAG, "componentName: " + cn.toShortString());
             Log.d(TAG, "Event: " + e.toString());
+        }
+        if (getInstance() == null ||
+                getInstance().mInCallApi == null ||
+                getInstance().mClient == null) {
+            // For testing purposes, this might be null
+            return;
         }
         getInstance().mInCallApi.sendAnalyticsEventToPlugin(getInstance().mClient, cn, e)
                 .setResultCallback(new ResultCallback<Result>() {
