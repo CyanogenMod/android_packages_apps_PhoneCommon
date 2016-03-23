@@ -138,17 +138,7 @@ public class CallMethodInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mId, mComponent, mName, mSummary, mSlotId, mSubId, mColor,
-                mMimeType, mVideoCallableMimeType, mSubscriptionButtonText, mCreditButtonText,
-                mT9HintDescription, mSettingsIntent, mBrandIcon, mSingleColorBrandIcon, mBadgeIcon,
-                mLoginIcon, mActionOneIcon, mActionTwoIcon, mActionOneText,
-                mActionTwoText, mIsInCallProvider, mLoginIntent, mDefaultDirectorySearchIntent,
-                mDirectorySearchIntent, mInviteIntent, mAccountType, mAccountHandle, mBrandIconId,
-                mLoginIconId, mNudgeComponent, mLoginSubtitle, mLoginNudgeEnable,
-                mLoginNudgeTitle, mLoginNudgeSubtitle, mLoginNudgeActionText,
-                mInstallNudgeEnable, mInstallNudgeTitle, mInstallNudgeSubtitle,
-                mInstallNudgeActionText, mDependentPackage, mImIcon, mVideoIcon, mVoiceIcon,
-                mIsAuthenticated);
+        return Objects.hashCode(mId, mComponent, mName, mSlotId, mSubId);
     }
 
     public static final String TAG = "CallMethodInfo";
@@ -163,48 +153,8 @@ public class CallMethodInfo {
             return Objects.equal(this.mId, info.mId)
                     && Objects.equal(this.mComponent, info.mComponent)
                     && Objects.equal(this.mName, info.mName)
-                    && Objects.equal(this.mSummary, info.mSummary)
                     && Objects.equal(this.mSlotId, info.mSlotId)
-                    && Objects.equal(this.mSubId, info.mSubId)
-                    && Objects.equal(this.mColor, info.mColor)
-                    && Objects.equal(this.mMimeType, info.mMimeType)
-                    && Objects.equal(this.mVideoCallableMimeType, info.mVideoCallableMimeType)
-                    && Objects.equal(this.mSubscriptionButtonText, info.mSubscriptionButtonText)
-                    && Objects.equal(this.mCreditButtonText, info.mCreditButtonText)
-                    && Objects.equal(this.mT9HintDescription, info.mT9HintDescription)
-                    && Objects.equal(this.mSettingsIntent, info.mSettingsIntent)
-                    && Objects.equal(this.mBrandIcon, info.mBrandIcon)
-                    && Objects.equal(this.mSingleColorBrandIcon, info.mSingleColorBrandIcon)
-                    && Objects.equal(this.mBadgeIcon, info.mBadgeIcon)
-                    && Objects.equal(this.mLoginIcon, info.mLoginIcon)
-                    && Objects.equal(this.mActionOneIcon, info.mActionOneIcon)
-                    && Objects.equal(this.mActionTwoIcon, info.mActionTwoIcon)
-                    && Objects.equal(this.mActionOneText, info.mActionOneText)
-                    && Objects.equal(this.mActionTwoText, info.mActionTwoText)
-                    && Objects.equal(this.mIsInCallProvider, info.mIsInCallProvider)
-                    && Objects.equal(this.mLoginIntent, info.mLoginIntent)
-                    && Objects.equal(this.mDefaultDirectorySearchIntent,
-                        info.mDefaultDirectorySearchIntent)
-                    && Objects.equal(this.mDirectorySearchIntent, info.mDirectorySearchIntent)
-                    && Objects.equal(this.mInviteIntent, info.mInviteIntent)
-                    && Objects.equal(this.mAccountType, info.mAccountType)
-                    && Objects.equal(this.mAccountHandle, info.mAccountHandle)
-                    && Objects.equal(this.mBrandIconId, info.mBrandIconId)
-                    && Objects.equal(this.mLoginIconId, info.mLoginIconId)
-                    && Objects.equal(this.mNudgeComponent, info.mNudgeComponent)
-                    && Objects.equal(this.mLoginSubtitle, info.mLoginSubtitle)
-                    && Objects.equal(this.mLoginNudgeEnable, info.mLoginNudgeEnable)
-                    && Objects.equal(this.mLoginNudgeTitle, info.mLoginNudgeTitle)
-                    && Objects.equal(this.mLoginNudgeSubtitle, info.mLoginNudgeSubtitle)
-                    && Objects.equal(this.mLoginNudgeActionText, info.mLoginNudgeActionText)
-                    && Objects.equal(this.mInstallNudgeEnable, info.mInstallNudgeEnable)
-                    && Objects.equal(this.mInstallNudgeTitle, info.mInstallNudgeTitle)
-                    && Objects.equal(this.mInstallNudgeSubtitle, info.mInstallNudgeSubtitle)
-                    && Objects.equal(this.mInstallNudgeActionText, info.mInstallNudgeActionText)
-                    && Objects.equal(this.mDependentPackage, info.mDependentPackage)
-                    && Objects.equal(this.mImIcon, info.mImIcon)
-                    && Objects.equal(this.mVideoIcon, info.mVideoIcon)
-                    && Objects.equal(this.mVoiceIcon, info.mVoiceIcon);
+                    && Objects.equal(this.mSubId, info.mSubId);
         }
         return false;
     }
