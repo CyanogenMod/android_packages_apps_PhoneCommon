@@ -633,7 +633,6 @@ public class CallMethodHelper {
                             cmi.mSubscriptionButtonText = icpi.getSubscriptionButtonText();
                             cmi.mCreditButtonText = icpi.getCreditsButtonText();
                             cmi.mT9HintDescription = icpi.getT9HintDescription();
-                            cmi.pluginResources = pluginResources;
                             cmi.mActionOneText = icpi.getActionOneTitle();
                             cmi.mActionTwoText = icpi.getActionTwoTitle();
                             cmi.mIsInCallProvider = true;

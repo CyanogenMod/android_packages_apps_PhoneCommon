@@ -93,7 +93,6 @@ public class CallMethodInfo {
        Expected format: Vector Drawable (.xml)
        2 colors allowed. */
     public Drawable mActionTwoIcon;
-    public Resources pluginResources;
     public String mActionOneText;
     public String mActionTwoText;
     public boolean mIsInCallProvider;
@@ -142,7 +141,7 @@ public class CallMethodInfo {
         return Objects.hashCode(mId, mComponent, mName, mSummary, mSlotId, mSubId, mColor,
                 mMimeType, mVideoCallableMimeType, mSubscriptionButtonText, mCreditButtonText,
                 mT9HintDescription, mSettingsIntent, mBrandIcon, mSingleColorBrandIcon, mBadgeIcon,
-                mLoginIcon, mActionOneIcon, mActionTwoIcon, pluginResources, mActionOneText,
+                mLoginIcon, mActionOneIcon, mActionTwoIcon, mActionOneText,
                 mActionTwoText, mIsInCallProvider, mLoginIntent, mDefaultDirectorySearchIntent,
                 mDirectorySearchIntent, mInviteIntent, mAccountType, mAccountHandle, mBrandIconId,
                 mLoginIconId, mNudgeComponent, mLoginSubtitle, mLoginNudgeEnable,
@@ -180,7 +179,6 @@ public class CallMethodInfo {
                     && Objects.equal(this.mLoginIcon, info.mLoginIcon)
                     && Objects.equal(this.mActionOneIcon, info.mActionOneIcon)
                     && Objects.equal(this.mActionTwoIcon, info.mActionTwoIcon)
-                    && Objects.equal(this.pluginResources, info.pluginResources)
                     && Objects.equal(this.mActionOneText, info.mActionOneText)
                     && Objects.equal(this.mActionTwoText, info.mActionTwoText)
                     && Objects.equal(this.mIsInCallProvider, info.mIsInCallProvider)
