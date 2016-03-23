@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.phone.common.R;
@@ -26,31 +27,40 @@ public class CreditBarHelper {
     }
 
     public static void clearCallRateInformation(ViewGroup v, CreditBarVisibilityListener cpvl) {
-        setCallRateInformation(v, null, null, null, cpvl);
+        setCallRateInformation(null, v, null, null, null, false, cpvl);
     }
 
-    public static void setCallRateInformation(ViewGroup creditsBar, String countryName,
-                                       String displayRate, final PendingIntent p,
-                                       CreditBarVisibilityListener cpvl) {
-        if (TextUtils.isEmpty(countryName) && TextUtils.isEmpty(displayRate) &&
-                p == null) {
+    public static void setCallRateInformation(Resources res, ViewGroup creditsBar,
+            String creditText, String buttonText, final PendingIntent buttonIntent,
+            boolean warnIfLow, CreditBarVisibilityListener cpvl) {
+        if (TextUtils.isEmpty(creditText) && TextUtils.isEmpty(buttonText) &&
+                buttonIntent == null) {
             creditsBar.setVisibility(View.GONE);
             cpvl.creditsBarVisibilityChanged(View.GONE);
             return;
         }
         creditsBar.setVisibility(View.VISIBLE);
         cpvl.creditsBarVisibilityChanged(View.VISIBLE);
-        TextView ildCountry = (TextView) creditsBar.findViewById(R.id.ild_country);
-        TextView ildRate = (TextView) creditsBar.findViewById(R.id.ild_rate);
 
-        ildCountry.setText(countryName);
-        ildRate.setText(displayRate);
-        ildRate.setOnClickListener(new View.OnClickListener() {
+        // These views already exist, we are hijacking them.
+        TextView credit = (TextView) creditsBar.findViewById(R.id.ild_country);
+        TextView button = (TextView) creditsBar.findViewById(R.id.ild_rate);
+
+        if (res != null) {
+            int color = warnIfLow ?
+                    res.getColor(R.color.credit_banner_alert_color) :
+                    res.getColor(R.color.credit_banner_text);
+            credit.setTextColor(color);
+        }
+
+        credit.setText(creditText);
+        button.setText(buttonText);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    if (p != null) {
-                        p.send();
+                    if (buttonIntent != null) {
+                        buttonIntent.send();
                     } else {
                         Log.wtf(TAG, "The intent we attempted to fire was null");
                     }
@@ -88,6 +98,6 @@ public class CreditBarHelper {
                 button = cmi.mLoginIntent;
             }
         }
-        setCallRateInformation(v, creditText, buttonText, button, cpvl);
+        setCallRateInformation(r, v, creditText, buttonText, button, warnIfLow, cpvl);
     }
 }
