@@ -248,7 +248,7 @@ public class CallMethodInfo {
 
         List<SubscriptionInfo> subscriptionInfos = ci.subscriptions;
 
-        if (subscriptionInfos != null && !subscriptionInfos.isEmpty()) {
+        if (showSubscriptions()) {
             int size = subscriptionInfos.size();
             return r.getQuantityString(R.plurals.number_of_incall_subscriptions, size, size);
         } else {
