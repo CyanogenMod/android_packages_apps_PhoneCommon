@@ -29,9 +29,10 @@ import android.telephony.SubscriptionManager;
 import android.text.TextUtils;
 import android.util.Log;
 import com.android.phone.common.ambient.AmbientConnection;
-import com.android.phone.common.incall.CallMethodHelper.InCallCallListener;
 import com.android.phone.common.R;
-import com.android.phone.common.util.StartInCallCallReceiver;
+import com.android.phone.common.incall.listeners.AuthenticationListenerImpl;
+import com.android.phone.common.incall.listeners.CallCreditListenerImpl;
+import com.android.phone.common.incall.utils.CallMethodUtils;
 import com.cyanogen.ambient.incall.InCallServices;
 import com.cyanogen.ambient.incall.extension.CreditBalance;
 import com.cyanogen.ambient.incall.extension.CreditInfo;
@@ -54,6 +55,7 @@ public class CallMethodInfo {
     public int mSubId;
     public int mColor;
     public int mStatus;
+    public boolean mIsInCallProvider;
     public boolean mIsAuthenticated;
     public String mMimeType;
     public String mVideoCallableMimeType;
@@ -62,7 +64,6 @@ public class CallMethodInfo {
     public String mCreditButtonText;
     public String mT9HintDescriptionNoCreditOrSub;
     public String mT9HintDescriptionHasCreditOrSub;
-    public PendingIntent mSettingsIntent;
     /* Plugin's simple brand icon (24dp x 24dp)
        Expected format: Vector Drawable (.xml)
        2 colors allowed. */
@@ -85,58 +86,44 @@ public class CallMethodInfo {
        Expected format: Vector Drawable (.xml)
        1 color allowed. */
     public Drawable mLoginIcon;
-    /* Plugin's first action icon (24dp x 24dp)
-       This icon is used in conjunction with pluginActionOneTitle.
-       Expected format: Vector Drawable (.xml)
-       2 colors allowed. */
-    public Drawable mActionOneIcon;
-    /* Plugin's second action icon (24dp x 24dp)
-       This icon is used in conjunction with pluginActionTwoTitle.
-       Expected format: Vector Drawable (.xml)
-       2 colors allowed. */
-    public Drawable mActionTwoIcon;
-    public String mActionOneText;
-    public String mActionTwoText;
-    public boolean mIsInCallProvider;
-    public PendingIntent mManageCreditIntent;
-    public CreditInfo mProviderCreditInfo;
-    public float mCreditWarn = 0.0f;
-    public PendingIntent mLoginIntent;
-    public PendingIntent mDefaultDirectorySearchIntent; // empty contact Uri
-    public PendingIntent mDirectorySearchIntent;
-    public PendingIntent mInviteIntent;
-    public String mAccountType;
-    private int mCurrencyAmount;
-    public String mAccountHandle;
-    public int mBrandIconId; // resource ID
-    public int mLoginIconId;
-
-    public ComponentName mNudgeComponent;
-    public String mLoginSubtitle;
-    // Contact login nudge
-    public boolean mLoginNudgeEnable;
-    public String mLoginNudgeTitle;
-    public String mLoginNudgeSubtitle;
-    public String mLoginNudgeActionText;
-    // Contact install nudge
-    public boolean mInstallNudgeEnable;
-    public String mInstallNudgeTitle;
-    public String mInstallNudgeSubtitle;
-    public String mInstallNudgeActionText;
-    public String mDependentPackage;
-    /* Plugin's IM action icon (24dp x 24dp)
-       Expected format: Vector Drawable (.xml)
-       1 color allowed. */
-    public Drawable mImIcon;
     /* Plugin's video call action icon (24dp x 24dp)
        Expected format: Vector Drawable (.xml)
        1 color allowed. */
     public Drawable mVideoIcon;
+    /* Plugin's IM action icon (24dp x 24dp)
+       Expected format: Vector Drawable (.xml)
+       1 color allowed. */
+    public Drawable mImIcon;
     /* Plugin's voice call action icon (24dp x 24dp)
        Expected format: Vector Drawable (.xml)
        1 color allowed. */
     public Drawable mVoiceIcon;
+    public CreditInfo mProviderCreditInfo;
+    public float mCreditWarn = 0.0f;
+    private int mCurrencyAmount;
+    private CallCreditListenerImpl mCreditListener;
+    public PendingIntent mManageCreditIntent;
+    public PendingIntent mLoginIntent;
+    public PendingIntent mDefaultDirectorySearchIntent; // empty contact Uri
+    public PendingIntent mDirectorySearchIntent;
+    public PendingIntent mInviteIntent;
+    public PendingIntent mSettingsIntent;
     private static CallMethodInfo sEmergencyCallMethod;
+    private AuthenticationListenerImpl mAuthListener;
+    public String mAccountType;
+    public String mDependentPackage;
+    public String mLoginSubtitle;
+    public String mAccountHandle;
+    public int mLoginIconId; // resource ID
+    public int mBrandIconId; // resource ID
+    // Contact install nudge
+    public boolean mInstallNudgeEnable;
+    public String mInstallNudgeSubtitle;
+    public String mInstallNudgeActionText;
+    // Contact login nudge
+    public boolean mLoginNudgeEnable;
+    public String mLoginNudgeSubtitle;
+    public String mLoginNudgeActionText;
 
     @Override
     public int hashCode() {
@@ -212,7 +199,7 @@ public class CallMethodInfo {
     }
 
     public void placeCall(String origin, String number, Context c, boolean isVideoCall, boolean
-            forcePSTN, InCallCallListener listener) {
+            forcePSTN, StartInCallCallReceiver.InCallCallListener listener) {
         placeCall(origin, number, c, isVideoCall, forcePSTN, null, listener);
     }
 
@@ -222,10 +209,11 @@ public class CallMethodInfo {
     }
 
     public void placeCall(String origin, String number, Context c, boolean isVideoCall,
-            boolean forcePSTN, String numberMimeType, InCallCallListener listener) {
+            boolean forcePSTN, String numberMimeType,
+            StartInCallCallReceiver.InCallCallListener listener) {
 
         StartInCallCallReceiver svcrr
-                = CallMethodHelper.getVoIPResultReceiver(this, origin, listener);
+                = CallMethodUtils.getVoIPResultReceiver(c, this, origin, listener);
         StartCallRequest request = new StartCallRequest(number, origin, 0, svcrr);
 
         if (isVideoCall) {
@@ -244,7 +232,6 @@ public class CallMethodInfo {
     }
 
     public String getCreditsDescriptionText(Resources r) {
-        String ret = null;
         CreditInfo ci =  this.mProviderCreditInfo;
 
         List<SubscriptionInfo> subscriptionInfos = ci.subscriptions;
@@ -350,4 +337,21 @@ public class CallMethodInfo {
         }
         return hintText;
     }
+
+    public CallCreditListenerImpl getCreditListener() {
+        return mCreditListener;
+    }
+
+    public AuthenticationListenerImpl getAuthListener() {
+        return mAuthListener;
+    }
+
+    public void setCreditListener(CallCreditListenerImpl creditListener) {
+        mCreditListener = creditListener;
+    }
+
+    public void setAuthListener(AuthenticationListenerImpl authListener) {
+        mAuthListener = authListener;
+    }
+
 }
