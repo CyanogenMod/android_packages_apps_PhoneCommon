@@ -46,5 +46,9 @@ public abstract class SingletonHolder<E, I> {
         return mInstance;
     }
 
+    public final boolean isCreated() {
+        return mInstance != null;
+    }
+
     protected abstract E create(I initializer);
 }
