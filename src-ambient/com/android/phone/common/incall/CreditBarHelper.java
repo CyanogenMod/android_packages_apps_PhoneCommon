@@ -6,11 +6,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.phone.common.R;
-import com.android.phone.common.incall.CallMethodInfo;
 
 /**
  * Helper method used to handle incall credit bars
