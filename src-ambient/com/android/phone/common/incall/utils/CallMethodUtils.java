@@ -1,7 +1,9 @@
-package com.android.phone.common.incall;
+package com.android.phone.common.incall.utils;
 
-import android.content.ComponentName;
 import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
@@ -12,10 +14,14 @@ import android.text.TextUtils;
 import android.util.ArrayMap;
 import android.util.Log;
 
+import android.widget.Toast;
 import com.android.contacts.common.model.AccountTypeManager;
 import com.android.contacts.common.model.account.AccountType;
 import com.android.contacts.common.model.account.AccountWithDataSet;
 import com.android.phone.common.R;
+import com.android.phone.common.incall.CallMethodInfo;
+import com.android.phone.common.incall.StartInCallCallReceiver;
+import com.cyanogen.ambient.incall.extension.StatusCodes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +32,10 @@ import static com.cyanogen.ambient.incall.util.InCallHelper.NO_COLOR;
  * Basic Utils for call method modifications
  */
 public class CallMethodUtils {
+
     private final static String TAG = CallMethodUtils.class.getSimpleName();
     private final static boolean DEBUG = false;
+
     public final static String PREF_SPINNER_COACHMARK_SHOW = "pref_spinner_coachmark_shown";
     public final static String PREF_LAST_ENABLED_PROVIDER = "pref_last_enabled_provider";
     public final static String PREF_INTERNATIONAL_CALLS = "pref_international_calls";
@@ -48,7 +56,7 @@ public class CallMethodUtils {
         final TelecomManager telecomMgr =
                 (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
         final List<PhoneAccountHandle> accountHandles = telecomMgr.getCallCapablePhoneAccounts();
-        ArrayList<CallMethodInfo> callMethodInfoList = new ArrayList<CallMethodInfo>();
+        ArrayList<CallMethodInfo> callMethodInfoList = new ArrayList<>();
         for (PhoneAccountHandle accountHandle : accountHandles) {
             CallMethodInfo info = phoneToCallMethod(context, accountHandle);
             if (info != null) {
@@ -122,7 +130,7 @@ public class CallMethodUtils {
         // state as authenticated
         AccountTypeManager accountTypes = AccountTypeManager.getInstance(context);
         List<AccountWithDataSet> accounts = accountTypes.getAccounts(false);
-        ArrayMap<String, String> accountMap = new ArrayMap<String, String>();
+        ArrayMap<String, String> accountMap = new ArrayMap<>();
 
         for (AccountWithDataSet account : accounts) {
             AccountType accountType =
@@ -147,5 +155,50 @@ public class CallMethodUtils {
     public static boolean isSoftLoggedOut(Context context, CallMethodInfo cmi) {
         return (!cmi.mIsAuthenticated && !TextUtils.isEmpty(lookupAccountHandle(context,
                 cmi.mAccountType)));
+    }
+
+
+    public static StartInCallCallReceiver getVoIPResultReceiver(Context context, CallMethodInfo cmi,
+                                                                String originCode) {
+        return getVoIPResultReceiver(context, cmi, originCode, null);
+    }
+
+    public static StartInCallCallReceiver getVoIPResultReceiver(final Context context,
+            final CallMethodInfo cmi, final String originCode,
+            final StartInCallCallReceiver.InCallCallListener listener) {
+
+        StartInCallCallReceiver svcrr =
+                new StartInCallCallReceiver(new Handler(Looper.getMainLooper()));
+
+        svcrr.setReceiver(new StartInCallCallReceiver.Receiver() {
+
+            @Override
+            public void onReceiveResult(int resultCode, Bundle resultData) {
+                if (DEBUG) Log.i(TAG, "Got Start VoIP Call result callback code = " + resultCode);
+
+                switch (resultCode) {
+                    case StatusCodes.StartCall.CALL_FAILURE_INSUFFICIENT_CREDITS:
+                    case StatusCodes.StartCall.CALL_FAILURE_INVALID_NUMBER:
+                    case StatusCodes.StartCall.CALL_FAILURE_TIMEOUT:
+                    case StatusCodes.StartCall.CALL_FAILURE_UNAUTHENTICATED:
+                    case StatusCodes.StartCall.CALL_FAILURE:
+                        String text = context.getResources()
+                                .getString(R.string.invalid_number_text);
+                        text = String.format(text, cmi.mName);
+                        Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+                        break;
+                    default:
+                        Log.i(TAG, "Nothing to do for this Start VoIP Call resultcode = "
+                                + resultCode);
+                        break;
+                }
+                if (listener != null) {
+                    listener.onResult(resultCode);
+                }
+            }
+
+        });
+
+        return svcrr;
     }
 }
