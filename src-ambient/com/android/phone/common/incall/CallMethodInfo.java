@@ -31,7 +31,7 @@ import android.util.Log;
 import com.android.phone.common.ambient.AmbientConnection;
 import com.android.phone.common.incall.CallMethodHelper.InCallCallListener;
 import com.android.phone.common.R;
-import com.android.phone.common.util.StartInCallCallReceiver;
+import com.android.phone.common.incall.utils.CallMethodUtils;
 import com.cyanogen.ambient.incall.InCallServices;
 import com.cyanogen.ambient.incall.extension.CreditBalance;
 import com.cyanogen.ambient.incall.extension.CreditInfo;
@@ -138,6 +138,10 @@ public class CallMethodInfo {
     public Drawable mVoiceIcon;
     private static CallMethodInfo sEmergencyCallMethod;
 
+    private CallCreditListenerImpl mCreditListener;
+    private AuthenticationListenerImpl mAuthListener;
+
+
     @Override
     public int hashCode() {
         return Objects.hashCode(mId, mComponent, mName, mSlotId, mSubId);
@@ -225,7 +229,7 @@ public class CallMethodInfo {
             boolean forcePSTN, String numberMimeType, InCallCallListener listener) {
 
         StartInCallCallReceiver svcrr
-                = CallMethodHelper.getVoIPResultReceiver(this, origin, listener);
+                = CallMethodUtils.getVoIPResultReceiver(c, this, origin, listener);
         StartCallRequest request = new StartCallRequest(number, origin, 0, svcrr);
 
         if (isVideoCall) {
@@ -350,4 +354,21 @@ public class CallMethodInfo {
         }
         return hintText;
     }
+
+    public CallCreditListenerImpl getCreditListener() {
+        return mCreditListener;
+    }
+
+    public AuthenticationListenerImpl getAuthListener() {
+        return mAuthListener;
+    }
+
+    public void setCreditListener(CallCreditListenerImpl creditListener) {
+        mCreditListener = creditListener;
+    }
+
+    public void setAuthListener(AuthenticationListenerImpl authListener) {
+        mAuthListener = authListener;
+    }
+
 }
