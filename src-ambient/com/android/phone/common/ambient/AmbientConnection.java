@@ -3,7 +3,6 @@ package com.android.phone.common.ambient;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-
 import com.cyanogen.ambient.analytics.AnalyticsServices;
 import com.cyanogen.ambient.callerinfo.CallerInfoServices;
 import com.cyanogen.ambient.common.ConnectionResult;
@@ -35,32 +34,31 @@ public class AmbientConnection {
                             new AmbientApiClient.OnConnectionFailedListener() {
                                 @Override
                                 public void onConnectionFailed(ConnectionResult result) {
-                                    Log.w(TAG, "Ambient connection failed: " + result);
+                                    Log.w(TAG, "Ambient failed: " + result);
                                 }
                             });
                     client.registerDisconnectionListener(
                             new AmbientApiClient.OnDisconnectionListener() {
                                 @Override
                                 public void onDisconnection() {
-                                    Log.d(TAG, "Ambient connection disconnected");
+                                    Log.d(TAG, "Ambient disconnected");
                                 }
                             });
                     client.registerConnectionCallbacks(
                             new AmbientApiClient.ConnectionCallbacks() {
                                 @Override
                                 public void onConnected(Bundle connectionHint) {
-                                    Log.d(TAG, "Ambient connection established");
+                                    Log.d(TAG, "Ambient established");
                                 }
 
                                 @Override
                                 public void onConnectionSuspended(int cause) {
-                                    Log.d(TAG, "Ambient connection suspended");
+                                    Log.d(TAG, "Ambient suspended");
                                 }
                             });
                     client.connect();
                     return client;
                 }
             };
-
 
 }
