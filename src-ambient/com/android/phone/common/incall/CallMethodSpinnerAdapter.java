@@ -41,6 +41,7 @@ import static com.cyanogen.ambient.incall.util.InCallHelper.NO_COLOR;
 
 public class CallMethodSpinnerAdapter extends ArrayAdapter<CallMethodInfo>
         implements SpinnerAdapter {
+
     private static final String TAG = CallMethodSpinnerAdapter.class.getSimpleName();
     public static final int POSITION_UNKNOWN = -1;
 
