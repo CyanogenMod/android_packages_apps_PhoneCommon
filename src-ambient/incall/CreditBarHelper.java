@@ -35,12 +35,16 @@ public class CreditBarHelper {
             boolean warnIfLow, CreditBarVisibilityListener cpvl) {
         if (TextUtils.isEmpty(creditText) && TextUtils.isEmpty(buttonText) &&
                 buttonIntent == null) {
-            creditsBar.setVisibility(View.GONE);
-            cpvl.creditsBarVisibilityChanged(View.GONE);
+            if (creditsBar.getVisibility() != View.GONE) {
+                creditsBar.setVisibility(View.GONE);
+                cpvl.creditsBarVisibilityChanged(View.GONE);
+            }
             return;
         }
-        creditsBar.setVisibility(View.VISIBLE);
-        cpvl.creditsBarVisibilityChanged(View.VISIBLE);
+        if (creditsBar.getVisibility() != View.VISIBLE) {
+            creditsBar.setVisibility(View.VISIBLE);
+            cpvl.creditsBarVisibilityChanged(View.VISIBLE);
+        }
 
         // These views already exist, we are hijacking them.
         TextView credit = (TextView) creditsBar.findViewById(R.id.ild_country);
