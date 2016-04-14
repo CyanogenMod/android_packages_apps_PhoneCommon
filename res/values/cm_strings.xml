@@ -28,9 +28,9 @@
 
     <string name="invalid_number_text">"%1$s could not make this call. Is the number correct?"</string>
 
-     <!-- InCall Sign in button -->
+    <!-- InCall Sign in button -->
     <string name="sign_in_credit_banner_text">SIGN IN</string>
 
-    <string name="call_method_spinner_volte_drop_down_tag">Spinner Volte Drop Down Tag</string>
-    <string name="call_method_spinner_drop_down_tag">Spinner Drop Down Tag</string>
+    <string name="call_method_spinner_volte_drop_down_tag" translatable="false">Spinner Volte Drop Down Tag</string>
+    <string name="call_method_spinner_drop_down_tag" translatable="false">Spinner Drop Down Tag</string>
 </resources>
