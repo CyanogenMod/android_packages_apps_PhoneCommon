@@ -16,7 +16,13 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!-- In-call screen: call failure reason (call ended due to low battery) -->
   <string name="callFailed_low_battery">电量不足</string>
+  <!-- Call method spinner - Default No SIM -->
+  <string name="call_method_spinner_item_no_sim">无 SIM 卡</string>
+  <string name="call_method_spinner_item_unknown_sim">SIM 卡 <xliff:g id="slot_number">%d</xliff:g></string>
+  <string name="call_method_spinner_item_emergency_call">只能拨打紧急电话</string>
+  <!-- InCall Sign in button -->
+  <string name="sign_in_credit_banner_text">登录</string>
 </resources>
