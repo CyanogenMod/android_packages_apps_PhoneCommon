@@ -17,7 +17,10 @@
      limitations under the License.
 -->
 <resources>
+  <!-- In-call screen: call failure reason (call modified to USSD request) -->
   <string name="callFailed_dialToUssd">DIAL-Ufro gouf an eng USSD-Ufro ëmgewandelt.</string>
+  <!-- In-call screen: call failure reason (call modified to SS request) -->
   <string name="callFailed_dialToSs">DIAL-Ufro gouf an eng SS-Ufro ëmgewandelt.</string>
+  <!-- In-call screen: call failure reason (call modified to call with modified data) -->
   <string name="callFailed_dialToDial">DIAL-Ufro gouf an eng DIAL-Ufro mat anerer Nummer ëmgewandelt.</string>
 </resources>

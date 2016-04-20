@@ -17,7 +17,10 @@
      limitations under the License.
 -->
 <resources>
+  <!-- In-call screen: call failure reason (call modified to USSD request) -->
   <string name="callFailed_dialToUssd">Zahtjev BIRANJA promjenjen u USSD zahtjev.</string>
+  <!-- In-call screen: call failure reason (call modified to SS request) -->
   <string name="callFailed_dialToSs">Zahtjev BIRANJA promjenjen u SS zahtjev.</string>
+  <!-- In-call screen: call failure reason (call modified to call with modified data) -->
   <string name="callFailed_dialToDial">Zahtjev BIRANJA promjenjen u BIRANJE drugog broja.</string>
 </resources>

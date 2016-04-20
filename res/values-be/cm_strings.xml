@@ -17,7 +17,10 @@
      limitations under the License.
 -->
 <resources>
+  <!-- In-call screen: call failure reason (call modified to USSD request) -->
   <string name="callFailed_dialToUssd">DIAL-запыт ператвораны ў USSD-запыт.</string>
+  <!-- In-call screen: call failure reason (call modified to SS request) -->
   <string name="callFailed_dialToSs">DIAL-запыт ператвораны ў SS-запыт.</string>
+  <!-- In-call screen: call failure reason (call modified to call with modified data) -->
   <string name="callFailed_dialToDial">DIAL-запыт ператвораны ў новы DIAL-запыт з іншым нумарам.</string>
 </resources>
