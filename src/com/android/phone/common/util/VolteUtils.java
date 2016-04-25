@@ -38,6 +38,7 @@ public class VolteUtils {
 
     public static boolean isVolteInUse(Context context, int subId) {
         return isVolteAvailable(context, subId) &&
-                ImsManager.isEnhanced4gLteModeSettingEnabledByUser(context);
+                ImsManager.isEnhanced4gLteModeSettingEnabledByUser(context) &&
+                ImsManager.isVolteCallCapable();
     }
 }
