@@ -16,7 +16,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:layout_width="@dimen/call_method_spinner_dropdown_item_width"
+    android:layout_width="match_parent"
     android:layout_height="@dimen/dialpad_digits_height"
     android:paddingStart="@dimen/call_method_spinner_item_default_padding"
     android:paddingEnd="@dimen/call_method_spinner_item_default_padding">
