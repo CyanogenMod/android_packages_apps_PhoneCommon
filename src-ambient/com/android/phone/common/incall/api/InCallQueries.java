@@ -28,6 +28,7 @@ import com.cyanogen.ambient.analytics.Event;
 import com.cyanogen.ambient.common.api.AmbientApiClient;
 import com.cyanogen.ambient.common.api.Result;
 import com.cyanogen.ambient.common.api.ResultCallback;
+import com.cyanogen.ambient.incall.extension.InCallContactInfo;
 
 /**
  * Queries for incall plugins
@@ -226,5 +227,17 @@ public class InCallQueries extends ApiHelper {
                         }
                     }
                 });
+    }
+
+    public static TypedPendingResult getDirectorySearchIntent(AmbientApiClient client,
+            ComponentName componentName, InCallContactInfo contactInfo) {
+        return new TypedPendingResult(thisApi().getDirectorySearchIntent(client, componentName,
+                contactInfo.mLookupUri), TypedPendingResult.DIRECTORY_SEARCH_INTENT);
+    }
+
+    public static TypedPendingResult getInviteIntent(AmbientApiClient client,
+            ComponentName componentName, InCallContactInfo contactInfo) {
+        return new TypedPendingResult(thisApi().getInviteIntent(client, componentName,
+                contactInfo), TypedPendingResult.INVITE_INTENT);
     }
 }

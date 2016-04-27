@@ -62,7 +62,7 @@ public class CallMethodFilters extends ApiHelper {
         HashMap<ComponentName, CallMethodInfo> cmi = new HashMap<>();
         for (Map.Entry<ComponentName, CallMethodInfo> entry : instance.getPluginInfo().entrySet()) {
             ComponentName key = entry.getKey();
-            CallMethodInfo value = entry.getValue();
+            CallMethodInfo value = entry.getValue().clone();
 
             if (value.mStatus == PluginStatus.ENABLED || value.mStatus == PluginStatus.HIDDEN) {
                 cmi.put(key, value);
@@ -90,5 +90,4 @@ public class CallMethodFilters extends ApiHelper {
         }
         return targetEntry;
     }
-
 }

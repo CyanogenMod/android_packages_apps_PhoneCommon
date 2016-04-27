@@ -42,6 +42,10 @@ public class TypedPendingResult {
     public static final int INCALL_CONTACT_CARD_DOWNLOAD = 1003;
     public static final int INCALL_CONTACT_FRAGMENT_LOGIN = 1004;
 
+    // 2000 - 3000 Reserved for invite intents
+    public static final int DIRECTORY_SEARCH_INTENT = 2000;
+    public static final int INVITE_INTENT = 2001;
+
     public TypedPendingResult(PendingResult pendingResult, int type) {
         this.mPendingResult = pendingResult;
         this.mType = type;
@@ -49,5 +53,17 @@ public class TypedPendingResult {
 
     public void setResultCallback(ResultCallback resultCallback, long length, TimeUnit unit) {
         this.mPendingResult.setResultCallback(resultCallback, length, unit);
+    }
+
+    public void setResultCallback(ResultCallback resultCallback) {
+        this.mPendingResult.setResultCallback(resultCallback);
+    }
+
+    public PendingResult getPendingResult() {
+        return mPendingResult;
+    }
+
+    public int getType() {
+        return mType;
     }
 }

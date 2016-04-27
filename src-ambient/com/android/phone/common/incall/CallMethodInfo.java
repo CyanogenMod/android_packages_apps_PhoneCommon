@@ -44,7 +44,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.List;
 
-public class CallMethodInfo {
+public class CallMethodInfo implements Cloneable {
 
     public String mId;
     public UserHandle mUserHandle;
@@ -105,8 +105,6 @@ public class CallMethodInfo {
     public PendingIntent mManageCreditIntent;
     public PendingIntent mLoginIntent;
     public PendingIntent mDefaultDirectorySearchIntent; // empty contact Uri
-    public PendingIntent mDirectorySearchIntent;
-    public PendingIntent mInviteIntent;
     public PendingIntent mSettingsIntent;
     private static CallMethodInfo sEmergencyCallMethod;
     private AuthenticationListenerImpl mAuthListener;
@@ -146,6 +144,16 @@ public class CallMethodInfo {
                     && Objects.equal(this.mSubId, info.mSubId);
         }
         return false;
+    }
+
+    @Override
+    public CallMethodInfo clone() {
+        // we only need Immutable types to be cloned
+        try {
+            return (CallMethodInfo) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
     }
 
     /**
