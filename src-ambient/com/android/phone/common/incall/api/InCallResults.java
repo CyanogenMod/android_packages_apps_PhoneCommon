@@ -27,6 +27,7 @@ import android.util.Log;
 import com.android.phone.common.ambient.AmbientDataSubscription;
 import com.android.phone.common.ambient.TypedPendingResult;
 import com.android.phone.common.incall.CallMethodInfo;
+import com.android.phone.common.incall.ContactsPendingIntents;
 import com.android.phone.common.incall.utils.CallMethodUtils;
 import com.android.phone.common.ambient.utils.PluginUtils;
 import com.android.phone.common.nudge.api.NudgeTypedResult;
@@ -279,5 +280,17 @@ public class InCallResults extends ApiHelper {
 
     private static String getKey(String key, CallMethodInfo cmi) {
         return cmi.mComponent.getClassName() + "." + key;
+    }
+
+    public static void gotContactsIntent(ContactsPendingIntents intents, PendingIntentResult result,
+            int type) {
+        switch(type) {
+            case TypedPendingResult.DIRECTORY_SEARCH_INTENT:
+                intents.mDirectorySearchIntent = result.intent;
+                break;
+            case TypedPendingResult.INVITE_INTENT:
+                intents.mInviteIntent = result.intent;
+                break;
+        }
     }
 }
