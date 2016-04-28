@@ -20,5 +20,8 @@
   <!-- In-call screen: call failure reason (call ended due to low battery) -->
   <string name="callFailed_low_battery">סוללה חלשה</string>
   <!-- Call method spinner - Default No SIM -->
+  <string name="call_method_spinner_item_no_sim">אין כרטיס SIM</string>
+  <string name="call_method_spinner_item_unknown_sim">SIM <xliff:g id="slot_number">%d</xliff:g></string>
+  <string name="call_method_spinner_item_emergency_call">שיחות חירום בלבד</string>
   <!-- InCall Sign in button -->
 </resources>

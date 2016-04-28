@@ -20,5 +20,6 @@
   <!-- In-call screen: call failure reason (call ended due to low battery) -->
   <string name="callFailed_low_battery">Lage accuspanning</string>
   <!-- Call method spinner - Default No SIM -->
+  <string name="invalid_number_text">"%1$s kon deze oproep niet voltooien. Is het nummer correct?"</string>
   <!-- InCall Sign in button -->
 </resources>
