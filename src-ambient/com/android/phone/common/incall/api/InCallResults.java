@@ -167,7 +167,7 @@ public class InCallResults extends ApiHelper {
     }
 
     public static void gotCreditData(CallMethodInfo callMethodInfo, GetCreditInfoResult result) {
-        if (result.creditInfo == null) {
+        if (result == null || result.creditInfo == null) {
             // Build zero credit dummy if no result found.
             callMethodInfo.mProviderCreditInfo = new CreditInfo(new CreditBalance(0, null), null);
         } else {
