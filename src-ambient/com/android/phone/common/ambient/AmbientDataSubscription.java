@@ -69,11 +69,16 @@ public abstract class AmbientDataSubscription<M> {
         @Override
         public void onResult(Result result) {
             List<ComponentName> installedPlugins = getPluginComponents(result);
-            for (ComponentName cn : installedPlugins) {
-                ArrayList<TypedPendingResult> apiCallbacks = new ArrayList<>();
-                getPluginInfo().put(cn, getNewModObject(cn));
-                requestedModInfo(apiCallbacks, cn);
-                executeAll(apiCallbacks, cn);
+            if (installedPlugins.size() != 0) {
+                for (ComponentName cn : installedPlugins) {
+                    ArrayList<TypedPendingResult> apiCallbacks = new ArrayList<>();
+                    getPluginInfo().put(cn, getNewModObject(cn));
+                    requestedModInfo(apiCallbacks, cn);
+                    executeAll(apiCallbacks, cn);
+                }
+            } else {
+                // We want to tell our subscribers that we have no plugins to worry about
+                broadcast();
             }
         }
 
