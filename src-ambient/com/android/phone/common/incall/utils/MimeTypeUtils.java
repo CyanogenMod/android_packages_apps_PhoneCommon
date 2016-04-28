@@ -52,10 +52,10 @@ public class MimeTypeUtils extends ApiHelper {
                     mimeType = cmi.mMimeType;
                     break;
                 case IM_MIME_TYPE:
-                    mimeType = cmi.mVideoCallableMimeType;
+                    mimeType = cmi.mImMimeType;
                     break;
                 case VIDEO_MIME_TYPE:
-                    mimeType = cmi.mImMimeType;
+                    mimeType = cmi.mVideoCallableMimeType;
             }
 
             if (!enabledOnly) {
