@@ -79,6 +79,7 @@ public abstract class AmbientDataSubscription<M> {
             } else {
                 // We want to tell our subscribers that we have no plugins to worry about
                 broadcast();
+                mDataHasBeenBroadcastPreviously = true;
             }
         }
 
