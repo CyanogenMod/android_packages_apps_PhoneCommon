@@ -32,6 +32,11 @@ import com.android.phone.common.R;
  * Provides static functions to work with views
  */
 public class ViewUtil {
+    // Setting text size using float may result in slightly bigger font. This is because all
+    // values between n.00 to n.99 lead to the same font size. Therefore, reducing the text size
+    // value by 1 to ensure text always fits in the text view.
+    private static final float textSizeMargin = 1.0f;
+
     private ViewUtil() {}
 
     /**
@@ -95,12 +100,13 @@ public class ViewUtil {
     public static void resizeText(TextView textView, int originalTextSize, int minTextSize) {
         final Paint paint = textView.getPaint();
         final int width = textView.getWidth();
+
         if (width == 0) return;
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, originalTextSize);
         float ratio = width / paint.measureText(textView.getText().toString());
         if (ratio <= 1.0f) {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    Math.max(minTextSize, originalTextSize * ratio));
+                    Math.max(minTextSize, originalTextSize * ratio - textSizeMargin));
         }
     }
 }
