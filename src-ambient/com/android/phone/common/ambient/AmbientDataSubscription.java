@@ -50,14 +50,14 @@ public abstract class AmbientDataSubscription<M> {
     // Holder for plugin object
     private HashMap<ComponentName, M> mPluginInfo;
 
-    private static boolean mDataHasBeenBroadcastPreviously = false;
+    private static boolean sDataHasBeenBroadcastPreviously = false;
 
     // A list of our registered clients, who all register with the CallMethodReceiver
-    private static HashMap<String, PluginChanged> mRegisteredClients = new HashMap<>();
+    private static HashMap<String, PluginChanged> sRegisteredClients = new HashMap<>();
 
     // A map of our components and if they have have enabled IInterface listeners. This is to keep
     // track of if listeners should be added or removed.
-    private static HashMap<ComponentName, Boolean> mEnabledListeners = new HashMap<>();
+    private static HashMap<ComponentName, Boolean> sEnabledListeners = new HashMap<>();
 
     // Wait up to 60 seconds for data to return. Mimicks what PluginBinderManager does.
     private static final long TIMEOUT_MILLISECONDS = 60000L;
@@ -69,17 +69,17 @@ public abstract class AmbientDataSubscription<M> {
         @Override
         public void onResult(Result result) {
             List<ComponentName> installedPlugins = getPluginComponents(result);
-            if (installedPlugins.size() != 0) {
+            if (installedPlugins.isEmpty()) {
+                // We want to tell our subscribers that we have no plugins to worry about
+                broadcast();
+                sDataHasBeenBroadcastPreviously = true;
+	    } else {
                 for (ComponentName cn : installedPlugins) {
                     ArrayList<TypedPendingResult> apiCallbacks = new ArrayList<>();
                     getPluginInfo().put(cn, getNewModObject(cn));
                     requestedModInfo(apiCallbacks, cn);
                     executeAll(apiCallbacks, cn);
                 }
-            } else {
-                // We want to tell our subscribers that we have no plugins to worry about
-                broadcast();
-                mDataHasBeenBroadcastPreviously = true;
             }
         }
 
@@ -155,21 +155,21 @@ public abstract class AmbientDataSubscription<M> {
     protected abstract M getNewModObject(ComponentName componentName);
 
     private void enablePluginListeners(ComponentName cn) {
-        if (!mEnabledListeners.containsKey(cn) || !mEnabledListeners.get(cn)) {
+        if (!sEnabledListeners.containsKey(cn) || !sEnabledListeners.get(cn)) {
             M plugin = getPluginIfExists(cn);
             if (plugin != null) {
                 enableListeners(plugin);
-                mEnabledListeners.put(cn, true);
+                sEnabledListeners.put(cn, true);
             }
 
         }
     }
 
     private void disablePluginListeners(ComponentName cn) {
-        if (mEnabledListeners.containsKey(cn) && mEnabledListeners.get(cn)) {
+        if (sEnabledListeners.containsKey(cn) && sEnabledListeners.get(cn)) {
             M plugin = getPluginIfExists(cn);
             disableListeners(plugin);
-            mEnabledListeners.put(cn, false);
+            sEnabledListeners.put(cn, false);
         }
     }
 
@@ -181,7 +181,7 @@ public abstract class AmbientDataSubscription<M> {
             @Override
             public void run() {
                 if (DEBUG) Log.d(TAG, "broadcast");
-                for (PluginChanged client : mRegisteredClients.values()) {
+                for (PluginChanged client : sRegisteredClients.values()) {
                     client.onChanged(mPluginInfo);
                 }
             }
@@ -197,9 +197,9 @@ public abstract class AmbientDataSubscription<M> {
      * @return boolean isempty
      */
     public boolean subscribe(String id, PluginChanged cmr) {
-        mRegisteredClients.put(id, cmr);
+        sRegisteredClients.put(id, cmr);
         if (DEBUG) Log.v("TAG", "subscribed: " + id);
-        return mDataHasBeenBroadcastPreviously;
+        return sDataHasBeenBroadcastPreviously;
     }
 
     /**
@@ -208,8 +208,8 @@ public abstract class AmbientDataSubscription<M> {
      * @param id of the client to remove
      */
     public void unsubscribe(String id) {
-        mRegisteredClients.remove(id);
-        if (mRegisteredClients.isEmpty()) {
+        sRegisteredClients.remove(id);
+        if (sRegisteredClients.isEmpty()) {
             for (ComponentName cn : mPluginInfo.keySet()) {
                 disablePluginListeners(cn);
             }
@@ -282,7 +282,7 @@ public abstract class AmbientDataSubscription<M> {
     }
 
     public static boolean infoReady() {
-        return mDataHasBeenBroadcastPreviously;
+        return sDataHasBeenBroadcastPreviously;
     }
 
     private void maybeBroadcastToSubscribers(ArrayList<PendingResult> apiCallbacks) {
@@ -311,7 +311,7 @@ public abstract class AmbientDataSubscription<M> {
             // if it's just a critical broadcast to prevent extra work from our subscribers
             // once our long running calls are broadcast then this will be true.
             if (!critical) {
-                mDataHasBeenBroadcastPreviously = true;
+                sDataHasBeenBroadcastPreviously = true;
             }
         }
     }
