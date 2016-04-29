@@ -69,6 +69,11 @@ public abstract class AmbientDataSubscription<M> {
         @Override
         public void onResult(Result result) {
             List<ComponentName> installedPlugins = getPluginComponents(result);
+            if (installedPlugins.isEmpty()) {
+                broadcast();
+                return;
+            }
+
             for (ComponentName cn : installedPlugins) {
                 ArrayList<TypedPendingResult> apiCallbacks = new ArrayList<>();
                 getPluginInfo().put(cn, getNewModObject(cn));
