@@ -32,6 +32,17 @@ import com.android.phone.common.R;
  * Provides static functions to work with views
  */
 public class ViewUtil {
+    /**
+     * The resizeText() function calculates maximum possible text size for the available width.
+     * In some cases, this leads to slightly bigger text than width of text view, causing string
+     * truncation.
+     * To prevent this issue, the text size is now reduced by a fixed value of 1. This solves the
+     * issue by providing enough margin on a failing product. This margin may not be enough
+     * for all scenarios. So it may need to be changed for other products.The goal is to keep this
+     * margin small enough to minimize impact on non-failing products.
+     */
+    private static final float textSizeMargin = 1.0f;
+
     private ViewUtil() {}
 
     /**
@@ -95,12 +106,13 @@ public class ViewUtil {
     public static void resizeText(TextView textView, int originalTextSize, int minTextSize) {
         final Paint paint = textView.getPaint();
         final int width = textView.getWidth();
+
         if (width == 0) return;
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, originalTextSize);
         float ratio = width / paint.measureText(textView.getText().toString());
         if (ratio <= 1.0f) {
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    Math.max(minTextSize, originalTextSize * ratio));
+                    Math.max(minTextSize, originalTextSize * ratio - textSizeMargin));
         }
     }
 }
