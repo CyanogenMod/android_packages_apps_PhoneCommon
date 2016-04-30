@@ -8,6 +8,7 @@ import com.cyanogen.ambient.analytics.AnalyticsServices;
 import com.cyanogen.ambient.callerinfo.CallerInfoServices;
 import com.cyanogen.ambient.common.ConnectionResult;
 import com.cyanogen.ambient.common.api.AmbientApiClient;
+import com.cyanogen.ambient.deeplink.DeepLinkServices;
 import com.cyanogen.ambient.discovery.DiscoveryManagerServices;
 import com.cyanogen.ambient.discovery.NudgeServices;
 import com.cyanogen.ambient.incall.InCallServices;
@@ -29,6 +30,7 @@ public class AmbientConnection {
                             .addApi(CallerInfoServices.API)
                             .addApi(NudgeServices.API)
                             .addApi(DiscoveryManagerServices.API)
+                            .addApi(DeepLinkServices.API)
                             .build();
 
                     client.registerConnectionFailedListener(
