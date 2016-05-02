@@ -259,12 +259,16 @@ public class InCallResults extends ApiHelper {
 
     private static void gotCreditWarn(CallMethodInfo callMethodInfo, Bundle bundle) {
         Object creditWarn = bundle.get(NudgeKey.INCALL_PARAM_CREDIT_WARN);
-        if (creditWarn.getClass().equals(Integer.class)) {
-            callMethodInfo.mCreditWarn = (Integer) creditWarn;
-        } else if (creditWarn.getClass().equals(Float.class)) {
-            callMethodInfo.mCreditWarn = (Float) creditWarn;
+        if (creditWarn != null) {
+            if (creditWarn.getClass().equals(Integer.class)) {
+                callMethodInfo.mCreditWarn = (Integer) creditWarn;
+            } else if (creditWarn.getClass().equals(Float.class)) {
+                callMethodInfo.mCreditWarn = (Float) creditWarn;
+            } else {
+                Log.e(TAG, "Invalid value for Credit Warn limit: " + creditWarn);
+            }
         } else {
-            Log.e(TAG, "Invalid value for Credit Warn limit: " + creditWarn);
+            Log.e(TAG, "No credit warn limit");
         }
     }
 
