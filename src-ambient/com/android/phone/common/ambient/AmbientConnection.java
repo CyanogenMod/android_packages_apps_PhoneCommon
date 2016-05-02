@@ -1,6 +1,7 @@
 package com.android.phone.common.ambient;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -18,20 +19,48 @@ import com.cyanogen.ambient.incall.InCallServices;
  */
 public class AmbientConnection {
 
+    private static boolean checkPermissionsGranted(Context context, String permission) {
+        int status = context.checkCallingOrSelfPermission(permission);
+        return status == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private static final String INCALL_PERMISSION
+            = "com.cyanogen.ambient.permission.BIND_INCALL_SERVICE";
+
+    private static final String PUBLISH_DISCOVERY_NUDGE
+            = "com.cyanogen.ambient.permission.PUBLISH_DISCOVERY_NUDGE";
+
+    private static final String DEEPLINK_SERVICE_PERMISSION
+            = "com.cyanogen.ambient.permission.BIND_DEEPLINK_SERVICE";
+
+    private static final String DEEPLINK_DATABASE_PERMISSION
+            = "com.cyanogen.ambient.permission.READ_DEEPLINK_DATABASE";
+
     public static final SingletonHolder<AmbientApiClient, Context> CLIENT =
             new SingletonHolder<AmbientApiClient, Context>() {
                 private static final String TAG = "PhoneCommon.AmbientSingletonHolder";
 
                 @Override
                 protected AmbientApiClient create(Context context) {
-                    AmbientApiClient client = new AmbientApiClient.Builder(context)
-                            .addApi(AnalyticsServices.API)
-                            .addApi(InCallServices.API)
-                            .addApi(CallerInfoServices.API)
-                            .addApi(NudgeServices.API)
-                            .addApi(DiscoveryManagerServices.API)
-                            .addApi(DeepLinkServices.API)
-                            .build();
+                    AmbientApiClient.Builder builder = new AmbientApiClient.Builder(context);
+                    builder.addApi(AnalyticsServices.API);
+                    builder.addApi(CallerInfoServices.API);
+
+                    if (checkPermissionsGranted(context, INCALL_PERMISSION)) {
+                        builder.addApi(InCallServices.API);
+                    }
+
+                    if (checkPermissionsGranted(context, PUBLISH_DISCOVERY_NUDGE)) {
+                        builder.addApi(NudgeServices.API);
+                        builder.addApi(DiscoveryManagerServices.API);
+                    }
+
+                    if (checkPermissionsGranted(context, DEEPLINK_SERVICE_PERMISSION) &&
+                            checkPermissionsGranted(context, DEEPLINK_DATABASE_PERMISSION)) {
+                        builder.addApi(DeepLinkServices.API);
+                    }
+
+                    AmbientApiClient client = builder.build();
 
                     client.registerConnectionFailedListener(
                             new AmbientApiClient.OnConnectionFailedListener() {
