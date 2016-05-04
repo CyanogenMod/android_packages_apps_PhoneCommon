@@ -32,6 +32,7 @@ import com.cyanogen.ambient.common.api.ResultCallback;
 import com.cyanogen.ambient.discovery.util.NudgeKey;
 import com.cyanogen.ambient.incall.extension.InCallContactInfo;
 import com.cyanogen.ambient.incall.results.PendingIntentResult;
+import com.cyanogen.ambient.plugin.PluginStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,8 +71,15 @@ public class ContactsDataSubscription extends DialerDataSubscription {
     @Override
     public void onDynamicRefreshRequested(ArrayList<TypedPendingResult> queries,
             ComponentName componentName) {
-        queries.add(InCallQueries.getCallMethodAuthenticated(mClient, componentName));
-        queries.add(InCallQueries.getCallMethodAccountHandle(mClient, componentName));
+        HashMap<ComponentName, CallMethodInfo> plugins = this.getPluginInfo();
+        if (plugins.containsKey(componentName)) {
+            CallMethodInfo cmi = plugins.get(componentName);
+            // only need to refresh plugins that exist and are ENABLED
+            if (cmi != null && cmi.mStatus == PluginStatus.ENABLED) {
+                queries.add(InCallQueries.getCallMethodAuthenticated(mClient, componentName));
+                queries.add(InCallQueries.getCallMethodAccountHandle(mClient, componentName));
+            }
+        }
     }
 
     @Override
@@ -93,6 +101,7 @@ public class ContactsDataSubscription extends DialerDataSubscription {
         queries.add(InCallQueries.getCallMethodMimeType(mClient, componentName));
         queries.add(InCallQueries.getCallMethodVideoCallableMimeType(mClient, componentName));
         queries.add(InCallQueries.getCallMethodAuthenticated(mClient, componentName));
+        queries.add(InCallQueries.getCallMethodAccountHandle(mClient, componentName));
         queries.add(InCallQueries.getLoginIntent(mClient, componentName));
         queries.add(InCallQueries.getDefaultDirectorySearchIntent(mClient, componentName));
         queries.add(InCallQueries.getCallMethodImMimeType(mClient, componentName));

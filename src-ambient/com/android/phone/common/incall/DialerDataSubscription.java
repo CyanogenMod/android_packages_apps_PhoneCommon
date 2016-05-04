@@ -40,8 +40,10 @@ import com.cyanogen.ambient.incall.results.MimeTypeResult;
 import com.cyanogen.ambient.incall.results.PendingIntentResult;
 import com.cyanogen.ambient.incall.results.PluginStatusResult;
 import com.android.phone.common.ambient.AmbientDataSubscription;
+import com.cyanogen.ambient.plugin.PluginStatus;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.cyanogen.ambient.incall.util.InCallHelper.NO_COLOR;
@@ -129,9 +131,15 @@ public class DialerDataSubscription extends AmbientDataSubscription<CallMethodIn
     @Override
     protected void onDynamicRefreshRequested(ArrayList<TypedPendingResult> queries,
             ComponentName componentName) {
-
-        queries.add(InCallQueries.getCallMethodAuthenticated(mClient, componentName));
-        queries.add(InCallQueries.getCreditInfo(mClient, componentName));
+        HashMap<ComponentName, CallMethodInfo> plugins = this.getPluginInfo();
+        if (plugins.containsKey(componentName)) {
+            CallMethodInfo cmi = plugins.get(componentName);
+            // only need to refresh plugins that exist and are ENABLED
+            if (cmi != null && cmi.mStatus == PluginStatus.ENABLED) {
+                queries.add(InCallQueries.getCallMethodAuthenticated(mClient, componentName));
+                queries.add(InCallQueries.getCreditInfo(mClient, componentName));
+            }
+        }
     }
 
     @Override
