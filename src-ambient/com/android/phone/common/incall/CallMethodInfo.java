@@ -241,7 +241,9 @@ public class CallMethodInfo implements Cloneable {
 
     public String getCreditsDescriptionText(Resources r) {
         CreditInfo ci =  this.mProviderCreditInfo;
-
+        if (ci == null) {
+            return null;
+        }
         List<SubscriptionInfo> subscriptionInfos = ci.subscriptions;
 
         if (showSubscriptions()) {
