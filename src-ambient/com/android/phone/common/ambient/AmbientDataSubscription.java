@@ -242,7 +242,9 @@ public abstract class AmbientDataSubscription<M> {
                     } else {
                         if (result.getStatus().isSuccess()) {
                             M plugin = getPluginIfExists(componentName);
-                            onPostResult(plugin, result, pendingResult.mType);
+                            if (plugin != null) {
+                                onPostResult(plugin, result, pendingResult.mType);
+                            }
 
                             // check to see if our onPostResult removed the plugin.
                             if (!getPluginInfo().containsKey(componentName)) {
