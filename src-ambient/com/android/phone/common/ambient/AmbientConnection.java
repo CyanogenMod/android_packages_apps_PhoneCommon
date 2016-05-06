@@ -45,13 +45,13 @@ public class AmbientConnection {
                     AmbientApiClient.Builder builder = new AmbientApiClient.Builder(context);
                     builder.addApi(AnalyticsServices.API);
                     builder.addApi(CallerInfoServices.API);
+                    builder.addApi(NudgeServices.API);
 
                     if (checkPermissionsGranted(context, INCALL_PERMISSION)) {
                         builder.addApi(InCallServices.API);
                     }
 
                     if (checkPermissionsGranted(context, PUBLISH_DISCOVERY_NUDGE)) {
-                        builder.addApi(NudgeServices.API);
                         builder.addApi(DiscoveryManagerServices.API);
                     }
 
