@@ -103,7 +103,6 @@ public class ContactsDataSubscription extends DialerDataSubscription {
         queries.add(InCallQueries.getCallMethodAuthenticated(mClient, componentName));
         queries.add(InCallQueries.getCallMethodAccountHandle(mClient, componentName));
         queries.add(InCallQueries.getLoginIntent(mClient, componentName));
-        queries.add(InCallQueries.getDefaultDirectorySearchIntent(mClient, componentName));
         queries.add(InCallQueries.getCallMethodImMimeType(mClient, componentName));
 
         TypedPendingResult fragLogin = NudgeQueries.getNudgeConfig(mClient, mContext, componentName,

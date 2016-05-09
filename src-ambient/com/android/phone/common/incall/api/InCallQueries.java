@@ -16,19 +16,23 @@
 
 package com.android.phone.common.incall.api;
 
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
+import com.android.contacts.incall.InCallMetricsHelper;
 import com.android.phone.common.ambient.AmbientDataSubscription;
 import com.android.phone.common.ambient.TypedPendingResult;
 import com.android.phone.common.incall.CallMethodInfo;
+import com.android.phone.common.incall.ContactsDataSubscription;
 import com.cyanogen.ambient.analytics.Event;
 import com.cyanogen.ambient.common.api.AmbientApiClient;
 import com.cyanogen.ambient.common.api.Result;
 import com.cyanogen.ambient.common.api.ResultCallback;
 import com.cyanogen.ambient.incall.extension.InCallContactInfo;
+import com.cyanogen.ambient.incall.results.PendingIntentResult;
 
 /**
  * Queries for incall plugins
@@ -200,6 +204,28 @@ public class InCallQueries extends ApiHelper {
             ComponentName componentName) {
         return new TypedPendingResult(thisApi().getDirectorySearchIntent(client, componentName,
                 Uri.parse("")), TypedPendingResult.DEFAULT_DIRECTORY_SEARCH_INTENT);
+    }
+
+    public static void fireDefaultDirectorySearchIntent(final Context context,
+            AmbientApiClient client, final ComponentName componentName) {
+
+        InCallQueries.getDefaultDirectorySearchIntent(client, componentName).setResultCallback(
+                new ResultCallback() {
+                    @Override
+                    public void onResult(Result result) {
+                        PendingIntentResult pendingIntent = (PendingIntentResult) result;
+                        try {
+                            if (pendingIntent.intent != null) {
+                                pendingIntent.intent.send();
+                                InCallMetricsHelper.increaseCount(context,
+                                        InCallMetricsHelper.Events.DIRECTORY_SEARCH,
+                                        componentName.flattenToString());
+                            }
+                        } catch (PendingIntent.CanceledException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     /**
