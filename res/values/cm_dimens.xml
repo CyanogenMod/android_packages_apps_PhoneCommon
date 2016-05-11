@@ -32,6 +32,7 @@
     <dimen name="call_method_spinner_arrow_width">24dp</dimen>
 
     <dimen name="dialpad_credits_padding">14dp</dimen>
+    <dimen name="dialpad_credits_spacing">4dp</dimen>
 
     <!-- Dimensions for VoLTE annunciator -->
     <dimen name="volte_padding_start">11dp</dimen>
