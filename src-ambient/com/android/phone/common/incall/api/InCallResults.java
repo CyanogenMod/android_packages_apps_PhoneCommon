@@ -101,10 +101,19 @@ public class InCallResults extends ApiHelper {
         }
     }
 
-    public static void gotAuthenticationState(CallMethodInfo callMethodInfo,
+    public static void gotAuthenticationState(CallMethodInfo callMethodInfo, Context context,
             AuthenticationStateResult result) {
         callMethodInfo.mIsAuthenticated
                 = result.result == StatusCodes.AuthenticationState.LOGGED_IN;
+        if (callMethodInfo.mIsAuthenticated) {
+            // Double check the account existencen to make sure the account is logged in
+            callMethodInfo.mAccountHandle
+                    = CallMethodUtils.lookupAccountHandle(context, callMethodInfo.mAccountType);
+            if (TextUtils.isEmpty(callMethodInfo.mAccountHandle)) {
+                // cannot find the logged in account, set auth state to false
+                callMethodInfo.mIsAuthenticated = false;
+            }
+        }
     }
 
     public static void gotAccountHandle(CallMethodInfo callMethodInfo, Context context,

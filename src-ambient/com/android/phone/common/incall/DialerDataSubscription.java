@@ -175,7 +175,7 @@ public class DialerDataSubscription extends AmbientDataSubscription<CallMethodIn
                 InCallResults.gotStatus(cmi, (PluginStatusResult)r);
                 break;
             case TypedPendingResult.AUTHENTICATION:
-                InCallResults.gotAuthenticationState(cmi, (AuthenticationStateResult)r);
+                InCallResults.gotAuthenticationState(cmi, mContext, (AuthenticationStateResult)r);
                 break;
             case TypedPendingResult.CREDIT_INFO:
                 GetCreditInfoResult gcir = ((GetCreditInfoResultResult)r).result;
