@@ -36,6 +36,9 @@ public class AmbientConnection {
     private static final String DEEPLINK_DATABASE_PERMISSION
             = "com.cyanogen.ambient.permission.READ_DEEPLINK_DATABASE";
 
+    private static final String CALLER_INFO_PERMISSION
+            = "com.cyanogen.ambient.permission.BIND_CALLER_INFO";
+
     public static final SingletonHolder<AmbientApiClient, Context> CLIENT =
             new SingletonHolder<AmbientApiClient, Context>() {
                 private static final String TAG = "PhoneCommon.AmbientSingletonHolder";
@@ -44,8 +47,11 @@ public class AmbientConnection {
                 protected AmbientApiClient create(Context context) {
                     AmbientApiClient.Builder builder = new AmbientApiClient.Builder(context);
                     builder.addApi(AnalyticsServices.API);
-                    builder.addApi(CallerInfoServices.API);
                     builder.addApi(NudgeServices.API);
+
+                    if (checkPermissionsGranted(context, CALLER_INFO_PERMISSION)) {
+                        builder.addApi(CallerInfoServices.API);
+                    }
 
                     if (checkPermissionsGranted(context, INCALL_PERMISSION)) {
                         builder.addApi(InCallServices.API);
