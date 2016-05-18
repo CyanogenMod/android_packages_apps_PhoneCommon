@@ -17,6 +17,7 @@
 package com.android.phone.common.incall.utils;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -128,10 +129,16 @@ public class CallMethodUtils {
                 getPhoneAccountColor(subMgr.getActiveSubscriptionInfo(callMethodInfo.mSubId));
         callMethodInfo.mIsInCallProvider = false;
 
-        final int simState = telephonyMgr.getSimState(callMethodInfo.mSlotId);
-        if ((simState == TelephonyManager.SIM_STATE_ABSENT) ||
-                (simState == TelephonyManager.SIM_STATE_UNKNOWN)) {
-            return null;
+        // SIP accounts do not have SIM status and should be handled differently.
+        Uri address = phoneAccount.getAddress();
+        if (address != null && PhoneAccount.SCHEME_SIP.equals(address.getScheme())) {
+            callMethodInfo.mBrandIcon = context.getDrawable(R.drawable.ic_dialer_sip_black_24dp);
+        } else {
+            final int simState = telephonyMgr.getSimState(callMethodInfo.mSlotId);
+            if ((simState == TelephonyManager.SIM_STATE_ABSENT) ||
+                    (simState == TelephonyManager.SIM_STATE_UNKNOWN)) {
+                return null;
+            }
         }
 
         return callMethodInfo;
