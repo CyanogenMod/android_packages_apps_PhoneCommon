@@ -128,10 +128,15 @@ public class CallMethodUtils {
                 getPhoneAccountColor(subMgr.getActiveSubscriptionInfo(callMethodInfo.mSubId));
         callMethodInfo.mIsInCallProvider = false;
 
-        final int simState = telephonyMgr.getSimState(callMethodInfo.mSlotId);
-        if ((simState == TelephonyManager.SIM_STATE_ABSENT) ||
-                (simState == TelephonyManager.SIM_STATE_UNKNOWN)) {
-            return null;
+        // SIP accounts do not have SIM status and should be handled differently.
+        if (PhoneAccount.SCHEME_SIP.equals(phoneAccount.getAddress().getScheme())) {
+            callMethodInfo.mBrandIcon = context.getDrawable(R.drawable.ic_dialer_sip_black_24dp);
+        } else {
+            final int simState = telephonyMgr.getSimState(callMethodInfo.mSlotId);
+            if ((simState == TelephonyManager.SIM_STATE_ABSENT) ||
+                    (simState == TelephonyManager.SIM_STATE_UNKNOWN)) {
+                return null;
+            }
         }
 
         return callMethodInfo;
