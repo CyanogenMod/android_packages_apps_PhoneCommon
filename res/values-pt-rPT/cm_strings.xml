@@ -17,7 +17,10 @@
      limitations under the License.
 -->
 <resources>
-  <string name="callFailed_dialToUssd">Pedido de marcação modificado para USSD.</string>
-  <string name="callFailed_dialToSs">Pedido de marcação modificado para SS.</string>
+  <!-- In-call screen: call failure reason (call modified to USSD request) -->
+  <string name="callFailed_dialToUssd">Pedido de marcação modificado para pedido USSD.</string>
+  <!-- In-call screen: call failure reason (call modified to SS request) -->
+  <string name="callFailed_dialToSs">Pedido de marcação modificado para pedido SS.</string>
+  <!-- In-call screen: call failure reason (call modified to call with modified data) -->
   <string name="callFailed_dialToDial">Pedido de marcação modificado para marcar com número diferente.</string>
 </resources>

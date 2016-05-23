@@ -17,7 +17,10 @@
      limitations under the License.
 -->
 <resources>
-  <string name="callFailed_dialToUssd">DIAL-begäran ändrades till USSD-begäran.</string>
-  <string name="callFailed_dialToSs">DIAL-begäran ändrades till SS-begäran.</string>
-  <string name="callFailed_dialToDial">DIAL-begäran ändrades till DIAL-begäran med annat nummer.</string>
+  <!-- In-call screen: call failure reason (call modified to USSD request) -->
+  <string name="callFailed_dialToUssd">SAMTALS-begäran ändrades till USSD-begäran.</string>
+  <!-- In-call screen: call failure reason (call modified to SS request) -->
+  <string name="callFailed_dialToSs">SAMTALS-begäran ändrades till SS-begäran.</string>
+  <!-- In-call screen: call failure reason (call modified to call with modified data) -->
+  <string name="callFailed_dialToDial">SAMTALS-begäran ändrades till en SAMTALS-begäran med annat nummer.</string>
 </resources>

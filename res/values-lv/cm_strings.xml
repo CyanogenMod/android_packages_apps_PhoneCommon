@@ -17,7 +17,10 @@
      limitations under the License.
 -->
 <resources>
+  <!-- In-call screen: call failure reason (call modified to USSD request) -->
   <string name="callFailed_dialToUssd">DIAL pieprasījums izmainīts uz USSD pieprasījumu.</string>
+  <!-- In-call screen: call failure reason (call modified to SS request) -->
   <string name="callFailed_dialToSs">DIAL pieprasījums izmainīts uz SS pieprasījumu.</string>
+  <!-- In-call screen: call failure reason (call modified to call with modified data) -->
   <string name="callFailed_dialToDial">DIAL pieprasījums izmainīts uz DIAL pieprasījumu ar citu numuru.</string>
 </resources>

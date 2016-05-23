@@ -17,7 +17,10 @@
      limitations under the License.
 -->
 <resources>
+  <!-- In-call screen: call failure reason (call modified to USSD request) -->
   <string name="callFailed_dialToUssd">डीआईएएल अनुरध को यूएसएसडी अनुरोध में बदला गया।</string>
+  <!-- In-call screen: call failure reason (call modified to SS request) -->
   <string name="callFailed_dialToSs">डीआईएएल अनुरध को एसएस अनुरोध में बदला गया।</string>
+  <!-- In-call screen: call failure reason (call modified to call with modified data) -->
   <string name="callFailed_dialToDial">डीआईएएल अनुरोध को भिन्न संख्या वाले डीआईएएल अनुरोध में बदला गया।</string>
 </resources>

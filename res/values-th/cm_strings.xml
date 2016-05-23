@@ -17,7 +17,10 @@
      limitations under the License.
 -->
 <resources>
+  <!-- In-call screen: call failure reason (call modified to USSD request) -->
   <string name="callFailed_dialToUssd">คำขอ DIAL ถูกแก้ไขเป็น คำขอ USSD</string>
+  <!-- In-call screen: call failure reason (call modified to SS request) -->
   <string name="callFailed_dialToSs">คำขอ DIAL ถูกแก้ไขเป็น คำขอ SS</string>
-  <string name="callFailed_dialToDial">คำขอ DIAL ถูกเปลี่ยนเป็นคำขอ DIAL หมายเลขอื่น</string>
+  <!-- In-call screen: call failure reason (call modified to call with modified data) -->
+  <string name="callFailed_dialToDial">คำขอ DIAL ถูกเปลี่ยนเป็นคำขอ DIAL ด้วยหมายเลขอื่น</string>
 </resources>

@@ -17,7 +17,10 @@
      limitations under the License.
 -->
 <resources>
+  <!-- In-call screen: call failure reason (call modified to USSD request) -->
   <string name="callFailed_dialToUssd">DIAL 請求已修改為 USSD 請求。</string>
+  <!-- In-call screen: call failure reason (call modified to SS request) -->
   <string name="callFailed_dialToSs">DIAL 請求已修改為 SS 請求。</string>
+  <!-- In-call screen: call failure reason (call modified to call with modified data) -->
   <string name="callFailed_dialToDial">DIAL 請求已修改為不同號碼的 DIAL 請求。</string>
 </resources>
