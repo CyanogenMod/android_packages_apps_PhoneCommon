@@ -27,6 +27,7 @@ import com.android.phone.common.incall.api.InCallQueries;
 import com.android.phone.common.incall.api.InCallResults;
 import com.android.phone.common.nudge.api.NudgeQueries;
 import com.cyanogen.ambient.common.api.Result;
+import com.cyanogen.ambient.common.api.ResultCallback;
 import com.cyanogen.ambient.discovery.results.BundleResult;
 import com.cyanogen.ambient.discovery.util.NudgeKey;
 import com.cyanogen.ambient.incall.extension.GetCreditInfoResult;
@@ -96,11 +97,30 @@ public class DialerDataSubscription extends AmbientDataSubscription<CallMethodIn
     }
 
     @Override
-    protected void requestedModInfo(ArrayList<TypedPendingResult> queries,
+    protected void getPluginStatus(final ComponentName componentName) {
+        InCallQueries.getCallMethodStatus(mClient, componentName).setResultCallback(
+                new ResultCallback<PluginStatusResult>() {
+                    @Override
+                    public void onResult(PluginStatusResult result) {
+                        CallMethodInfo cmi = getPluginInfo().get(componentName);
+                        InCallResults.gotStatus(cmi, result);
+                        switch (cmi.mStatus) {
+                            case PluginStatus.ENABLED:
+                                getEnabledModInfo(componentName);
+                                break;
+                            case PluginStatus.DISABLED:
+                                getDisabledModInfo(componentName);
+                                break;
+                        }
+                    }
+                });
+    }
+
+    @Override
+    protected void enabledModInfo(ArrayList<TypedPendingResult> queries,
             ComponentName componentName) {
 
         queries.add(InCallQueries.getCallMethodInfo(mClient, componentName));
-        queries.add(InCallQueries.getCallMethodStatus(mClient, componentName));
         queries.add(InCallQueries.getCallMethodMimeType(mClient, componentName));
         queries.add(InCallQueries.getCallMethodVideoCallableMimeType(mClient, componentName));
         queries.add(InCallQueries.getCallMethodAuthenticated(mClient, componentName));
@@ -116,6 +136,15 @@ public class DialerDataSubscription extends AmbientDataSubscription<CallMethodIn
             queries.add(creditQuery);
         }
     }
+
+    @Override
+    protected void disabledModInfo(ArrayList<TypedPendingResult> queries,
+            ComponentName componentName) {
+
+        queries.add(InCallQueries.getCallMethodInfo(mClient, componentName));
+        queries.add(InCallQueries.getSettingsIntent(mClient, componentName));
+    }
+
 
     @Override
     protected CallMethodInfo getNewModObject(ComponentName componentName) {

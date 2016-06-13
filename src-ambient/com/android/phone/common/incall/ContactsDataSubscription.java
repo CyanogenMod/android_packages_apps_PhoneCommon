@@ -93,7 +93,13 @@ public class ContactsDataSubscription extends DialerDataSubscription {
     }
 
     @Override
-    protected void requestedModInfo(ArrayList<TypedPendingResult> queries,
+    protected void disabledModInfo(ArrayList<TypedPendingResult> queries,
+            ComponentName componentName) {
+        // Stubbed out, Contacts doesn't do anything if we don't have a plugin enabled.
+    }
+
+    @Override
+    protected void enabledModInfo(ArrayList<TypedPendingResult> queries,
             ComponentName componentName) {
 
         queries.add(InCallQueries.getCallMethodInfo(mClient, componentName));
