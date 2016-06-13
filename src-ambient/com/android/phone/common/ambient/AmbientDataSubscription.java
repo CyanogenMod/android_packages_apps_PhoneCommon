@@ -71,10 +71,8 @@ public abstract class AmbientDataSubscription<M> {
             List<ComponentName> installedPlugins = getPluginComponents(result);
             if (installedPlugins.size() != 0) {
                 for (ComponentName cn : installedPlugins) {
-                    ArrayList<TypedPendingResult> apiCallbacks = new ArrayList<>();
                     getPluginInfo().put(cn, getNewModObject(cn));
-                    requestedModInfo(apiCallbacks, cn);
-                    executeAll(apiCallbacks, cn);
+                    getPluginStatus(cn);
                 }
             } else {
                 // We want to tell our subscribers that we have no plugins to worry about
@@ -84,6 +82,18 @@ public abstract class AmbientDataSubscription<M> {
         }
 
     };
+
+    public void getDisabledModInfo(ComponentName cn) {
+        ArrayList<TypedPendingResult> apiCallbacks = new ArrayList<>();
+        disabledModInfo(apiCallbacks, cn);
+        executeAll(apiCallbacks, cn);
+    }
+
+    public void getEnabledModInfo(ComponentName cn) {
+        ArrayList<TypedPendingResult> apiCallbacks = new ArrayList<>();
+        enabledModInfo(apiCallbacks, cn);
+        executeAll(apiCallbacks, cn);
+    }
 
     public AmbientDataSubscription(Context context) {
         mContext = context;
@@ -116,12 +126,28 @@ public abstract class AmbientDataSubscription<M> {
     /**
      * Gets the required queries for all our plugins
      *
+     * @param componentName ComponentName of the plugin we will be querying
+     */
+    protected abstract void getPluginStatus(ComponentName componentName);
+
+    /**
+     * Gets the enabled queries for all our plugins
+     *
      * @param queries ArrayList for us to add TypedPendingResults to
      * @param componentName ComponentName of the plugin we will be querying
      */
-    protected abstract void requestedModInfo(ArrayList<TypedPendingResult> queries,
+    protected abstract void enabledModInfo(ArrayList<TypedPendingResult> queries,
                                              ComponentName componentName);
 
+
+    /**
+     * Gets the disabled queries for all our plugins
+     *
+     * @param queries ArrayList for us to add TypedPendingResults to
+     * @param componentName ComponentName of the plugin we will be querying
+     */
+    protected abstract void disabledModInfo(ArrayList<TypedPendingResult> queries,
+            ComponentName componentName);
 
     /**
      * Action that takes place when a refresh is requested.
