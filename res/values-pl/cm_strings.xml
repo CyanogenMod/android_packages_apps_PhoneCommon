@@ -18,5 +18,5 @@
 -->
 <resources>
   <!-- In-call screen: call failure reason (call ended due to low battery) -->
-  <string name="callFailed_low_battery">Niskim poziom baterii</string>
+  <string name="callFailed_low_battery">Niski poziom baterii</string>
 </resources>
