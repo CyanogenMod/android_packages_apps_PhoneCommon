@@ -18,7 +18,7 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!-- In-call screen: call failure reason (call ended due to low battery) -->
-  <string name="callFailed_low_battery">Niski poziom baterii</string>
+  <string name="callFailed_low_battery">Niskim poziom baterii</string>
   <!-- Call method spinner - Default No SIM -->
   <string name="call_method_spinner_item_no_sim">Brak karty SIM</string>
   <string name="call_method_spinner_item_unknown_sim">SIM <xliff:g id="slot_number">%d</xliff:g></string>
