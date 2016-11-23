@@ -47,6 +47,7 @@
   <!-- Text for CallFailCause.INVALID_NUMBER = 28 -->
   <!-- Text for CallFailCause.FACILITY_REJECTED = 29 -->
   <!-- Text for CallFailCause.STATUS_ENQUIRY = 30 -->
+  <string name="callFailed_resp_to_status_enquiry">STATUS ENQUIRY 响应</string>
   <!-- Text for CallFailCause.NORMAL_UNSPECIFIED = 31 -->
   <!-- Text for CallFailCause.TEMPORARY_FAILURE = 41 -->
   <!-- Text for CallFailCause.SWITCHING_CONGESTION = 42 -->
