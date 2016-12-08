@@ -107,5 +107,6 @@
   <string name="ringtone_unknown">Tonu de llamada desconocíu</string>
   <!-- In-call screen: call ended because the user has reached the maximum number of calls on their current devices and other devices. -->
   <!-- In-call screen: call ended because the user disabled data on their device -->
-  <!-- In-call screen: call ended because the cellular data limit has been reached -->
+  <!-- In-call screen: call ended because the cellular data limit has been reached (suitable for alert dialog) -->
+  <!-- In-call screen: call ended because the cellular data limit has been reached (intended for label in in-call screen) -->
 </resources>
