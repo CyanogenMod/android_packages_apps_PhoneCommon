@@ -76,6 +76,7 @@
   <!-- Text for CallFailCause.MESSAGE_TYPE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE = 98 -->
   <!-- Text for CallFailCause.INFORMATION_ELEMENT_NON_EXISTENT = 99 -->
   <!-- Text for CallFailCause.CONDITIONAL_IE_ERROR = 100 -->
+  <string name="callFailed_conditional_IE_error">Bedingter IE Fehler</string>
   <!-- Text for CallFailCause.MESSAGE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE = 101 -->
   <!-- Text for CallFailCause.RECOVERY_ON_TIMER_EXPIRED = 102 -->
   <!-- Text for CallFailCause.PROTOCOL_ERROR_UNSPECIFIED = 111 -->
