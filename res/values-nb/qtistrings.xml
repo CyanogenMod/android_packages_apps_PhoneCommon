@@ -33,19 +33,32 @@
 <resources>
   <!-- Supplementary for Clear Code -->
   <!-- Text for CallFailCause.NO_CIRCUIT_AVAIL = 34 -->
+  <string name="callFailed_no_circuit_avail">Ingen krets tilgjengelig</string>
   <!-- Text for CallFailCause.NETWORK_OUT_OF_ORDER = 38 -->
+  <string name="callFailed_network_out_of_order">Nettverk i ustand</string>
   <!-- Text for CallFailCause.NO_ROUTE_TO_DESTINAON = 3 -->
+  <string name="callFailed_no_route_to_destination">Ingen rute til destinasjonen</string>
   <!-- Text for CallFailCause.CHANNEL_UNACCEPTABLE = 6 -->
+  <string name="callFailed_channel_unacceptable">Kanal uakseptabel</string>
   <!-- Text for CallFailCause.OPERATOR_DETERMINED_BARRING = 8 -->
+  <string name="callFailed_operator_determined_barring">Operatørbestemt sperring</string>
   <!-- Text for CallFailCause.NORMAL_CLEARING = 16 -->
+  <string name="callFailed_normal">Normal samtaleslutt</string>
   <!-- Text for CallFailCause.CALL_FAIL_NO_USER_RESPONDING = 18 -->
+  <string name="callFailed_no_user_responding">Ingen bruker svarer</string>
   <!-- Text for CallFailCause.CALL_FAIL_NO_ANSWER_FROM_USER = 19 -->
+  <string name="callFailed_no_answer_from_user">Bruker varsler, ingen svar</string>
   <!-- Text for CallFailCause.CALL_REJECTED = 21 -->
+  <string name="callFailed_call_rejected">Anrop avvist</string>
   <!-- Text for CallFailCause.NUMBER_CHANGED = 22 -->
+  <string name="callFailed_number_changed">Nummer endret</string>
   <!-- Text for CallFailCause.PREEMPTION = 25 -->
   <!-- Text for CallFailCause.CALL_FAIL_DESTINATION_OUT_OF_ORDER = 27 -->
+  <string name="callFailed_destination_out_of_order">Destinasjon i ustand</string>
   <!-- Text for CallFailCause.INVALID_NUMBER = 28 -->
+  <string name="callFailed_invalid_number_format">Ugyldig tallformat (ufullstendig tall)</string>
   <!-- Text for CallFailCause.FACILITY_REJECTED = 29 -->
+  <string name="callFailed_facility_rejected">Anlegg avvist</string>
   <!-- Text for CallFailCause.STATUS_ENQUIRY = 30 -->
   <!-- Text for CallFailCause.NORMAL_UNSPECIFIED = 31 -->
   <!-- Text for CallFailCause.TEMPORARY_FAILURE = 41 -->
