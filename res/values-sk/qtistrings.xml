@@ -55,7 +55,7 @@
   <!-- Text for CallFailCause.PREEMPTION = 25 -->
   <string name="callFailed_preemption">Prednostné</string>
   <!-- Text for CallFailCause.CALL_FAIL_DESTINATION_OUT_OF_ORDER = 27 -->
-  <string name="callFailed_destination_out_of_order">Cíl je mimo prevádzku</string>
+  <string name="callFailed_destination_out_of_order">Cieľ je mimo prevádzku</string>
   <!-- Text for CallFailCause.INVALID_NUMBER = 28 -->
   <string name="callFailed_invalid_number_format">Neplatný formát čísla (neúplné číslo)</string>
   <!-- Text for CallFailCause.FACILITY_REJECTED = 29 -->
